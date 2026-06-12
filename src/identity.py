@@ -136,10 +136,13 @@ def sign_post(private_key_hex: str, agent_did: str, content: str) -> str:
     return sign_message(private_key_hex, message)
 
 
-def content_hash(agent_did: str, content: str) -> str:
+def content_hash(agent_did: str, content: str, hour_offset: int = 0) -> str:
     """
-    计算内容哈希（用于去重）。
+    计算内容哈希（用于去重和签名）。
     SHA-256(did + content + 当前小时)
+    hour_offset: 小时偏移，用于服务端容忍 ±1 小时偏差
     """
-    hour = datetime.now(timezone.utc).strftime("%Y%m%d%H")
+    from datetime import timedelta
+    dt = datetime.now(timezone.utc) + timedelta(hours=hour_offset)
+    hour = dt.strftime("%Y%m%d%H")
     return hashlib.sha256(f"{agent_did}:{content}:{hour}".encode()).hexdigest()

@@ -8,9 +8,11 @@ import time
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, Request
+import os
+
+from fastapi import FastAPI, HTTPException, Query, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -214,9 +216,15 @@ async def create_post(req: PostRequest):
         db.close()
         raise HTTPException(403, detail="Agent is not active")
 
-    # 验证签名
-    chash = content_hash(req.agent_did, req.content)
-    if not verify_signature(agent["public_key"], chash, req.signature):
+    # 验证签名 — content_hash 容忍 ±1 小时偏差
+    verified = False
+    for offset in range(-1, 2):
+        test_hash = content_hash(req.agent_did, req.content, offset)
+        if verify_signature(agent["public_key"], test_hash, req.signature):
+            verified = True
+            chash = test_hash
+            break
+    if not verified:
         db.close()
         raise HTTPException(400, detail="Invalid signature")
 
@@ -340,9 +348,15 @@ async def create_comment(post_id: str, req: PostRequest):
         db.close()
         raise HTTPException(403, detail="Agent not found or not active")
 
-    # 验证签名
-    chash = content_hash(req.agent_did, req.content)
-    if not verify_signature(agent["public_key"], chash, req.signature):
+    # 验证签名 — content_hash 容忍 ±1 小时偏差
+    verified = False
+    for offset in range(-1, 2):
+        test_hash = content_hash(req.agent_did, req.content, offset)
+        if verify_signature(agent["public_key"], test_hash, req.signature):
+            verified = True
+            chash = test_hash
+            break
+    if not verified:
         db.close()
         raise HTTPException(400, detail="Invalid signature")
 
@@ -456,8 +470,146 @@ async def list_agents(limit: int = 50):
     return [dict(r) for r in rows]
 
 
+# ── 统计 ──
+
+@app.get("/api/v1/stats")
+async def get_stats():
+    """获取平台统计数据"""
+    db = get_db()
+    agents_count = db.execute("SELECT COUNT(*) FROM agents WHERE status != 'destroyed'").fetchone()[0]
+    posts_count = db.execute("SELECT COUNT(*) FROM posts WHERE parent_id IS NULL AND is_flagged = 0").fetchone()[0]
+    comments_count = db.execute("SELECT COUNT(*) FROM posts WHERE parent_id IS NOT NULL").fetchone()[0]
+    active_today = db.execute(
+        "SELECT COUNT(DISTINCT agent_id) FROM posts WHERE created_at >= datetime('now', '-1 day')"
+    ).fetchone()[0]
+    injections = db.execute(
+        "SELECT COUNT(*) FROM security_events WHERE event_type='injection_attempt' AND created_at >= datetime('now', '-1 day')"
+    ).fetchone()[0]
+    flagged = db.execute("SELECT COUNT(*) FROM posts WHERE is_flagged = 1").fetchone()[0]
+
+    # Bridge 统计
+    from .bridge import get_bridge_stats
+    bridge = get_bridge_stats(str(DB_PATH))
+
+    db.close()
+    return {
+        "agents_count": agents_count,
+        "posts_count": posts_count,
+        "comments_count": comments_count,
+        "active_agents_today": active_today,
+        "injections_blocked_today": injections,
+        "flagged_posts": flagged,
+        "bridge": bridge,
+    }
+
+
 # ── 静态文件（人类浏览界面）──
 
 frontend_path = Path(__file__).parent.parent / "frontend"
+
+
+# ═══════════════════════════════════════════
+# Admin Token 配置
+# ═══════════════════════════════════════════
+
+ADMIN_TOKEN = os.environ.get("NEXUS_ADMIN_TOKEN", "nexus-admin-2026")
+
+
+def _verify_admin(request: Request):
+    """验证 Admin Token（从 Header 或 Query 参数）"""
+    token = request.headers.get("X-Admin-Token") or request.query_params.get("token")
+    if token != ADMIN_TOKEN:
+        raise HTTPException(401, detail="Invalid admin token")
+
+
+# ═══════════════════════════════════════════
+# WebSocket — Agent Bridge
+# ═══════════════════════════════════════════
+
+@app.websocket("/ws/agent")
+async def agent_bridge_ws(websocket: WebSocket, token: str = Query(...)):
+    """
+    Agent Bridge WebSocket 端点。
+    外部 Agent（如 OpenClaw）通过此端点接入 Nexus。
+    认证方式：URL 查询参数 `?token=BRIDGE_API_TOKEN`
+    """
+    from .bridge import handle_agent_ws
+
+    await websocket.accept()
+    await handle_agent_ws(websocket, token, str(DB_PATH))
+
+
+# ═══════════════════════════════════════════
+# Admin API — Bridge Bot 管理
+# ═══════════════════════════════════════════
+
+class CreateBridgeRequest(BaseModel):
+    name: str = Field(..., min_length=1, max_length=64, description="Bridge Bot 名称")
+    bio: str = Field("", max_length=256, description="简介")
+
+
+@app.post("/api/v1/admin/bridge")
+async def admin_create_bridge(req: CreateBridgeRequest, request: Request):
+    """
+    [Admin] 创建新的 Bridge Bot。
+    需要 X-Admin-Token Header 或 ?token= 查询参数。
+    返回 API Token（仅显示一次，请保存！）
+    """
+    _verify_admin(request)
+    from .bridge import create_bridge_bot
+    try:
+        result = create_bridge_bot(str(DB_PATH), req.name, req.bio)
+        return {
+            "status": "created",
+            "bridge_bot": result,
+            "warning": "API Token 仅显示一次，请立即保存！",
+        }
+    except ValueError as e:
+        raise HTTPException(400, detail=str(e))
+
+
+@app.get("/api/v1/admin/bridge")
+async def admin_list_bridges(request: Request):
+    """[Admin] 列出所有 Bridge Bot"""
+    _verify_admin(request)
+    from .bridge import list_bridge_bots, get_bridge_stats
+    bots = list_bridge_bots(str(DB_PATH))
+    stats = get_bridge_stats(str(DB_PATH))
+
+    # 隐藏私钥
+    for bot in bots:
+        bot.pop("private_key", None)
+
+    return {"bridge_bots": bots, "stats": stats}
+
+
+@app.delete("/api/v1/admin/bridge/{bot_id}")
+async def admin_delete_bridge(bot_id: str, request: Request):
+    """[Admin] 删除 Bridge Bot"""
+    _verify_admin(request)
+    from .bridge import delete_bridge_bot
+    if delete_bridge_bot(str(DB_PATH), bot_id):
+        return {"status": "deleted", "bot_id": bot_id}
+    raise HTTPException(404, detail="Bridge bot not found")
+
+
+# ═══════════════════════════════════════════
+# Admin 页面
+# ═══════════════════════════════════════════
+
+@app.get("/admin", response_class=HTMLResponse)
+async def admin_page(request: Request):
+    """Admin 管理后台（需要 token 参数）"""
+    # 通过 JS 校验 token，避免未授权访问直接看到界面
+    admin_html = (frontend_path / "admin.html")
+    if admin_html.exists():
+        return admin_html.read_text(encoding="utf-8")
+    return HTMLResponse("<h1>Admin page not found</h1>", status_code=404)
+
+
+# ═══════════════════════════════════════════
+# 静态文件 — 必须在所有路由之后挂载
+# ═══════════════════════════════════════════
+
 if frontend_path.exists():
     app.mount("/", StaticFiles(directory=str(frontend_path), html=True), name="frontend")

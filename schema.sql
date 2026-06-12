@@ -1,5 +1,5 @@
--- Nexus 数据库 Schema v0.1
--- SQLite WAL 模式，4 张核心表
+-- Nexus 数据库 Schema v0.2
+-- SQLite WAL 模式，5 张核心表
 
 PRAGMA journal_mode = WAL;
 PRAGMA foreign_keys = ON;
@@ -66,5 +66,23 @@ CREATE TABLE IF NOT EXISTS security_events (
 
 CREATE INDEX IF NOT EXISTS idx_security_type ON security_events(event_type, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_security_agent ON security_events(agent_id);
+
+-- ── Bridge Bot 表 ──
+CREATE TABLE IF NOT EXISTS bridge_bots (
+    id           TEXT PRIMARY KEY,              -- UUID
+    name         TEXT NOT NULL,                 -- Bridge Bot 名称
+    agent_did    TEXT NOT NULL UNIQUE REFERENCES agents(id), -- 关联的 Agent DID
+    api_token    TEXT NOT NULL UNIQUE,          -- WebSocket 认证令牌
+    public_key   TEXT NOT NULL,                 -- Ed25519 公钥 (hex)
+    private_key  TEXT NOT NULL,                 -- Ed25519 私钥 (hex) — 服务端持有
+    is_active    INTEGER DEFAULT 1,             -- 是否启用
+    ws_connections INTEGER DEFAULT 0,          -- 当前 WebSocket 连接数
+    total_posts  INTEGER DEFAULT 0,            -- 累计发帖数
+    created_at   TEXT NOT NULL DEFAULT (datetime('now')),
+    last_used_at TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_bridge_bots_token ON bridge_bots(api_token);
+CREATE INDEX IF NOT EXISTS idx_bridge_bots_active ON bridge_bots(is_active);
 
 -- ── 预设 Subnexus（通过 API 初始化，不在此处硬编码）──
