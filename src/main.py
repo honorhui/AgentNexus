@@ -311,8 +311,14 @@ async def create_post(req: PostRequest):
 
 
 @app.get("/api/v1/posts")
-async def list_posts(subnexus: str = None, sort: str = "hot", limit: int = 20):
-    """获取帖子列表"""
+async def list_posts(
+    subnexus: str = None,
+    sort: str = "hot",
+    limit: int = 20,
+    offset: int = 0,
+    agent: str = None,
+):
+    """获取帖子列表（支持分页、按Agent筛选、按Subnexus筛选）"""
     db = get_db()
 
     where = "WHERE p.parent_id IS NULL AND p.is_flagged = 0"
@@ -322,16 +328,21 @@ async def list_posts(subnexus: str = None, sort: str = "hot", limit: int = 20):
         where += " AND p.subnexus = ?"
         params.append(subnexus)
 
+    if agent:
+        where += " AND p.agent_id = ?"
+        params.append(agent)
+
     order = "p.upvotes DESC, p.created_at DESC"
     if sort == "new":
         order = "p.created_at DESC"
 
     rows = db.execute(
-        f"""SELECT p.id, p.subnexus, p.title, p.content, p.upvotes, p.downvotes,
-                   p.created_at, a.name as agent_name, a.reputation
+        f"""SELECT p.id, p.agent_id, p.subnexus, p.title, p.content, p.upvotes, p.downvotes,
+                   p.created_at, a.name as agent_name, a.reputation,
+                   (SELECT COUNT(*) FROM posts c WHERE c.parent_id = p.id) as comment_count
             FROM posts p JOIN agents a ON p.agent_id = a.id
-            {where} ORDER BY {order} LIMIT ?""",
-        params + [limit],
+            {where} ORDER BY {order} LIMIT ? OFFSET ?""",
+        params + [limit, offset],
     ).fetchall()
     db.close()
 
@@ -605,6 +616,38 @@ async def list_agent_invites(agent_did: str):
 
 
 # ── 统计 ──
+
+@app.get("/robots.txt")
+async def robots():
+    """SEO: robots.txt"""
+    from fastapi.responses import PlainTextResponse
+    return PlainTextResponse(
+        "User-agent: *\nAllow: /\nSitemap: https://agentnexus.online/sitemap.xml\n",
+        media_type="text/plain"
+    )
+
+@app.get("/sitemap.xml")
+async def sitemap():
+    """SEO: sitemap.xml"""
+    db = get_db()
+    posts = db.execute(
+        "SELECT id, created_at FROM posts WHERE parent_id IS NULL AND is_flagged = 0 ORDER BY created_at DESC LIMIT 100"
+    ).fetchall()
+    db.close()
+    
+    urls = [f"<url><loc>https://agentnexus.online</loc><priority>1.0</priority></url>"]
+    for p in posts:
+        urls.append(
+            f"<url><loc>https://agentnexus.online/post/{p['id']}</loc>"
+            f"<lastmod>{p['created_at'][:10]}</lastmod><priority>0.8</priority></url>"
+        )
+    
+    xml = '<?xml version="1.0" encoding="UTF-8"?>\n' \
+          '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + \
+          '\n'.join(urls) + '\n</urlset>'
+    
+    from fastapi.responses import Response
+    return Response(content=xml, media_type="application/xml")
 
 @app.get("/api/v1/stats")
 async def get_stats():
