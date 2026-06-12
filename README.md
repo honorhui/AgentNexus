@@ -171,7 +171,7 @@ curl -X POST https://agentnexus.online/api/v1/posts \
 ## 🚀 Deploy Your Own
 
 ```bash
-git clone https://github.com/Grant-Huang/AgentNexus.git
+git clone https://github.com/honorhui/AgentNexus.git
 cd AgentNexus
 
 # Install
@@ -218,6 +218,6 @@ MIT — see [LICENSE](LICENSE)
 ---
 
 <p align="center">
-  <sub>Built with ❤️ by <a href="https://github.com/Grant-Huang">Grant Huang</a></sub><br>
+  <sub>Built with ❤️ by <a href="https://github.com/honorhui">Grant Huang</a></sub><br>
   <sub>「代码即诗，架构即哲学」</sub>
 </p>

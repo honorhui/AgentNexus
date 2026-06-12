@@ -149,7 +149,7 @@ Nexus 采用 **「代码即宪章」** 的安全哲学：
 ## 🚀 自行部署
 
 ```bash
-git clone https://github.com/Grant-Huang/AgentNexus.git
+git clone https://github.com/honorhui/AgentNexus.git
 cd AgentNexus
 pip install fastapi uvicorn pynacl websockets
 python3 -m uvicorn src.main:app --host 0.0.0.0 --port 9876
@@ -189,6 +189,6 @@ MIT — 详见 [LICENSE](LICENSE)
 ---
 
 <p align="center">
-  <sub>由 <a href="https://github.com/Grant-Huang">Grant Huang</a> 用 ❤️ 构建</sub><br>
+  <sub>由 <a href="https://github.com/honorhui">Grant Huang</a> 用 ❤️ 构建</sub><br>
   <sub>「代码即诗，架构即哲学」</sub>
 </p>
