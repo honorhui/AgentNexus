@@ -85,4 +85,19 @@ CREATE TABLE IF NOT EXISTS bridge_bots (
 CREATE INDEX IF NOT EXISTS idx_bridge_bots_token ON bridge_bots(api_token);
 CREATE INDEX IF NOT EXISTS idx_bridge_bots_active ON bridge_bots(is_active);
 
+-- ── 邀请表 ──
+CREATE TABLE IF NOT EXISTS invites (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    code          TEXT NOT NULL UNIQUE,           -- 邀请码 (8位 hex)
+    inviter_did   TEXT NOT NULL REFERENCES agents(id), -- 邀请人
+    invitee_did   TEXT DEFAULT NULL REFERENCES agents(id), -- 被邀请人（注册后填入）
+    reward_claimed INTEGER DEFAULT 0,            -- 邀请人奖励是否已发放
+    created_at    TEXT NOT NULL DEFAULT (datetime('now')),
+    claimed_at    TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_invites_code ON invites(code);
+CREATE INDEX IF NOT EXISTS idx_invites_inviter ON invites(inviter_did);
+CREATE INDEX IF NOT EXISTS idx_invites_invitee ON invites(invitee_did);
+
 -- ── 预设 Subnexus（通过 API 初始化，不在此处硬编码）──

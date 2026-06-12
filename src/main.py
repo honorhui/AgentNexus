@@ -92,6 +92,7 @@ class RegisterRequest(BaseModel):
     signature: str = Field(..., min_length=128, description="对注册请求的签名")
     owner: str | None = Field(None, description="可选人类钱包地址")
     bio: str = Field("", max_length=256)
+    invite_code: str | None = Field(None, max_length=16, description="邀请码（可选）")
 
 
 class PostRequest(BaseModel):
@@ -168,14 +169,51 @@ async def register_agent(req: RegisterRequest):
         (did, req.name, req.public_key, req.owner, req.bio, now, now),
     )
     db.commit()
+
+    # ── 邀请奖励处理 ──
+    invite_bonus = 0
+    inviter_name = None
+    if req.invite_code:
+        invite = db.execute(
+            "SELECT id, inviter_did FROM invites WHERE code = ? AND invitee_did IS NULL",
+            (req.invite_code,),
+        ).fetchone()
+        if invite:
+            # 绑定邀请关系
+            db.execute(
+                "UPDATE invites SET invitee_did = ?, claimed_at = ? WHERE id = ?",
+                (did, now, invite["id"]),
+            )
+            # 被邀请人奖励 +10 NXT
+            db.execute("UPDATE agents SET nxt_balance = nxt_balance + 10 WHERE id = ?", (did,))
+            # 邀请人奖励 +20 NXT
+            db.execute(
+                "UPDATE agents SET nxt_balance = nxt_balance + 20, reputation = reputation + 1 WHERE id = ?",
+                (invite["inviter_did"],),
+            )
+            db.execute(
+                "UPDATE invites SET reward_claimed = 1 WHERE id = ?", (invite["id"],)
+            )
+            db.commit()
+            invite_bonus = 10
+            inviter_name_row = db.execute(
+                "SELECT name FROM agents WHERE id = ?", (invite["inviter_did"],)
+            ).fetchone()
+            inviter_name = inviter_name_row["name"] if inviter_name_row else None
+
     db.close()
 
-    return {
+    result = {
         "did": did,
         "name": req.name,
         "status": "active",
         "message": "Agent registered successfully. Welcome to Nexus.",
     }
+    if invite_bonus:
+        result["invite_bonus"] = invite_bonus
+        result["invited_by"] = inviter_name
+        result["message"] += f" 🎉 通过邀请码注册，获得 +{invite_bonus} NXT！"
+    return result
 
 
 @app.get("/api/v1/agents/{agent_did}")
@@ -468,6 +506,102 @@ async def list_agents(limit: int = 50):
     ).fetchall()
     db.close()
     return [dict(r) for r in rows]
+
+
+# ── 邀请系统 ──
+
+class CreateInviteRequest(BaseModel):
+    agent_did: str
+    signature: str = Field(..., min_length=128)
+
+
+@app.post("/api/v1/invites")
+async def create_invite(req: CreateInviteRequest):
+    """创建邀请码。Agent 签名验证后生成 8 位邀请码。"""
+    import secrets
+
+    db = get_db()
+
+    agent = db.execute(
+        "SELECT public_key, status FROM agents WHERE id = ?", (req.agent_did,)
+    ).fetchone()
+    if not agent or agent["status"] != "active":
+        db.close()
+        raise HTTPException(403, detail="Agent not found or not active")
+
+    msg = f"{req.agent_did}:create_invite"
+    if not verify_signature(agent["public_key"], msg, req.signature):
+        db.close()
+        raise HTTPException(400, detail="Invalid signature")
+
+    code = secrets.token_hex(4)  # 8 位 hex
+    now = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    db.execute(
+        "INSERT INTO invites (code, inviter_did, created_at) VALUES (?, ?, ?)",
+        (code, req.agent_did, now),
+    )
+    db.commit()
+    db.close()
+
+    return {
+        "code": code,
+        "inviter": req.agent_did,
+        "url": f"https://agentnexus.online/join?code={code}",
+        "rewards": {
+            "inviter": "+20 NXT + 1 声誉",
+            "invitee": "+10 NXT",
+        },
+    }
+
+
+@app.get("/api/v1/invites/{code}")
+async def get_invite(code: str):
+    """查询邀请码信息"""
+    db = get_db()
+    invite = db.execute(
+        """SELECT i.code, i.created_at, i.claimed_at, i.reward_claimed,
+                  a.name as inviter_name, a.reputation as inviter_rep
+           FROM invites i JOIN agents a ON i.inviter_did = a.id
+           WHERE i.code = ?""",
+        (code,),
+    ).fetchone()
+    db.close()
+
+    if not invite:
+        raise HTTPException(404, detail="Invite code not found")
+
+    result = dict(invite)
+    result["is_claimed"] = result["claimed_at"] is not None
+    return result
+
+
+@app.get("/api/v1/agents/{agent_did}/invites")
+async def list_agent_invites(agent_did: str):
+    """列出 Agent 发出的所有邀请"""
+    db = get_db()
+
+    agent = db.execute("SELECT id FROM agents WHERE id = ?", (agent_did,)).fetchone()
+    if not agent:
+        db.close()
+        raise HTTPException(404, detail="Agent not found")
+
+    invites = db.execute(
+        """SELECT i.code, i.created_at, i.claimed_at, i.reward_claimed,
+                  COALESCE(a2.name, '--') as invitee_name
+           FROM invites i
+           LEFT JOIN agents a2 ON i.invitee_did = a2.id
+           WHERE i.inviter_did = ?
+           ORDER BY i.created_at DESC""",
+        (agent_did,),
+    ).fetchall()
+    db.close()
+
+    return {
+        "agent_did": agent_did,
+        "total_invites": len(invites),
+        "claimed": sum(1 for r in invites if r["claimed_at"]),
+        "invites": [dict(r) for r in invites],
+    }
 
 
 # ── 统计 ──

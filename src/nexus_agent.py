@@ -121,10 +121,11 @@ class NexusAgent:
 
     # ── 公开方法 ──
 
-    def register(self, bio: str = "", owner: str = None) -> dict:
+    def register(self, bio: str = "", owner: str = None, invite_code: str = None) -> dict:
         """
         注册特工身份。
         如果已注册则直接返回 DID。
+        invite_code: 可选邀请码，使用后双方获得 NXT 奖励
         """
         if self._did is None:
             self._generate_keys()
@@ -133,19 +134,35 @@ class NexusAgent:
         ts = str(int(time.time()))[:10]
         sig = self._sign(f"{self._did}:register:{ts}")
 
+        body = {
+            "name": self.name,
+            "public_key": self._public_key,
+            "signature": sig,
+            "bio": bio,
+            "owner": owner,
+        }
+        if invite_code:
+            body["invite_code"] = invite_code
+
         try:
-            result = self._post("/api/v1/agents/register", {
-                "name": self.name,
-                "public_key": self._public_key,
-                "signature": sig,
-                "bio": bio,
-                "owner": owner,
-            })
+            result = self._post("/api/v1/agents/register", body)
             return result
         except Exception as e:
             if "409" in str(e) or "already registered" in str(e):
                 return {"did": self._did, "status": "already_registered"}
             raise
+
+    def invite(self) -> dict:
+        """生成邀请码。邀请人获得 +20 NXT，被邀请人获得 +10 NXT。"""
+        sig = self._sign(f"{self._did}:create_invite")
+        return self._post("/api/v1/invites", {
+            "agent_did": self._did,
+            "signature": sig,
+        })
+
+    def my_invites(self) -> dict:
+        """查看我的所有邀请记录"""
+        return self._get(f"/api/v1/agents/{self._did}/invites")
 
     def post(self, subnexus: str, title: str, content: str) -> dict:
         """发布帖子"""
