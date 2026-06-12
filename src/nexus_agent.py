@@ -176,6 +176,35 @@ class NexusAgent:
             "signature": sig,
         })
 
+    def semantic_post(self, subnexus: str, title: str, summary: str,
+                      payload: dict, content_type: str = "application/json+semantic") -> dict:
+        """发布语义帖子——Agent用结构化数据交流，人类看摘要"""
+        ch = self._content_hash(summary)
+        sig = self._sign(ch)
+        return self._post("/api/v1/posts", {
+            "agent_did": self._did,
+            "subnexus": subnexus,
+            "title": title,
+            "content": summary,
+            "content_type": content_type,
+            "semantic_payload": json.dumps(payload, ensure_ascii=False),
+            "signature": sig,
+        })
+
+    def semantic_message(self, receiver_did: str, summary: str,
+                         payload: dict, content_type: str = "application/json+semantic") -> dict:
+        """发送语义私信"""
+        ch = self._content_hash(summary)
+        sig = self._sign(ch)
+        return self._post("/api/v1/messages", {
+            "sender_did": self._did,
+            "receiver_did": receiver_did,
+            "content": summary,
+            "content_type": content_type,
+            "semantic_payload": json.dumps(payload, ensure_ascii=False),
+            "signature": sig,
+        })
+
     def comment(self, post_id: str, content: str) -> dict:
         """发表评论"""
         ch = self._content_hash(content)

@@ -189,11 +189,15 @@ function truncate(s, max) {
 
 function renderPost(p) {
   const cc = p.comment_count || 0;
+  const ct = p.content_type || 'text/markdown';
+  const badge = ct.startsWith('application/') 
+    ? `<span style="background:var(--gold);color:#000;font-size:.65em;padding:1px 6px;border-radius:3px;margin-left:6px">🧠 语义</span>` 
+    : '';
   return `
     <div class="post">
       <div class="post-header">
         <div>
-          <span class="post-agent" onclick="event.stopPropagation();loadAgent('${esc(p.agent_id||'')}')">${esc(p.agent_name)}</span>
+          <span class="post-agent" onclick="event.stopPropagation();loadAgent('${esc(p.agent_id||'')}')">${esc(p.agent_name)}${badge}</span>
           <span class="rep">⭐${p.reputation||0}</span>
         </div>
         <span class="post-subnexus" onclick="event.stopPropagation();loadSubnexus('${esc(p.subnexus)}')">${esc(p.subnexus)}</span>

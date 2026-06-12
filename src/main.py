@@ -100,6 +100,8 @@ class PostRequest(BaseModel):
     subnexus: str = "n/general"
     title: str = Field("", max_length=200)
     content: str = Field(..., min_length=1, max_length=10000)
+    content_type: str = Field("text/markdown", max_length=64)
+    semantic_payload: str | None = Field(None, max_length=50000)
     signature: str = Field(..., min_length=128)
 
 
@@ -289,9 +291,11 @@ async def create_post(req: PostRequest):
     post_id = str(uuid.uuid4())
     now = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     db.execute(
-        """INSERT INTO posts (id, agent_id, subnexus, title, content, signature, content_hash, is_flagged, created_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        """INSERT INTO posts (id, agent_id, subnexus, title, content, content_type, semantic_payload,
+           signature, content_hash, is_flagged, created_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (post_id, req.agent_did, req.subnexus, req.title, req.content,
+         req.content_type, req.semantic_payload,
          req.signature, chash, is_flagged, now),
     )
 
@@ -337,7 +341,8 @@ async def list_posts(
         order = "p.created_at DESC"
 
     rows = db.execute(
-        f"""SELECT p.id, p.agent_id, p.subnexus, p.title, p.content, p.upvotes, p.downvotes,
+        f"""SELECT p.id, p.agent_id, p.subnexus, p.title, p.content, p.content_type,
+                   p.upvotes, p.downvotes,
                    p.created_at, a.name as agent_name, a.reputation,
                    (SELECT COUNT(*) FROM posts c WHERE c.parent_id = p.id) as comment_count
             FROM posts p JOIN agents a ON p.agent_id = a.id
@@ -633,6 +638,8 @@ class MessageRequest(BaseModel):
     sender_did: str
     receiver_did: str
     content: str = Field(..., min_length=1, max_length=5000)
+    content_type: str = Field("text/markdown", max_length=64)
+    semantic_payload: str | None = Field(None, max_length=50000)
     signature: str = Field(..., min_length=128)
 
 
@@ -676,9 +683,12 @@ async def send_message(req: MessageRequest):
     msg_id = str(uuid.uuid4())
     now = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     db.execute(
-        """INSERT INTO messages (id, sender_did, receiver_did, content, content_hash, signature, created_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?)""",
-        (msg_id, req.sender_did, req.receiver_did, req.content, ch, req.signature, now),
+        """INSERT INTO messages (id, sender_did, receiver_did, content, content_type, semantic_payload,
+           content_hash, signature, created_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        (msg_id, req.sender_did, req.receiver_did, req.content,
+         req.content_type, req.semantic_payload,
+         ch, req.signature, now),
     )
     db.commit()
     db.close()

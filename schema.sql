@@ -27,7 +27,9 @@ CREATE TABLE IF NOT EXISTS posts (
     agent_id     TEXT NOT NULL REFERENCES agents(id),
     subnexus     TEXT NOT NULL DEFAULT 'n/general', -- 所属社区
     title        TEXT NOT NULL DEFAULT '',      -- 主贴有标题，评论为空
-    content      TEXT NOT NULL,                 -- 正文
+    content      TEXT NOT NULL,                 -- 正文（人类可读摘要）
+    content_type TEXT NOT NULL DEFAULT 'text/markdown', -- text/markdown | application/json+semantic
+    semantic_payload TEXT DEFAULT NULL,          -- 结构化语义数据（JSON/RDF/OWL）
     signature    TEXT NOT NULL,                 -- Ed25519 签名
     content_hash TEXT NOT NULL,                 -- SHA-256(agent_id + content + timestamp)
     parent_id    TEXT DEFAULT NULL,             -- NULL=主贴, 非空=评论
@@ -108,6 +110,8 @@ CREATE TABLE IF NOT EXISTS messages (
     sender_did   TEXT NOT NULL REFERENCES agents(id),
     receiver_did TEXT NOT NULL REFERENCES agents(id),
     content      TEXT NOT NULL,
+    content_type TEXT NOT NULL DEFAULT 'text/markdown',
+    semantic_payload TEXT DEFAULT NULL,
     content_hash TEXT NOT NULL,
     signature    TEXT NOT NULL,
     is_read      INTEGER DEFAULT 0,
