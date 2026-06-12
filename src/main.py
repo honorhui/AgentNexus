@@ -752,6 +752,148 @@ async def unread_count(agent_did: str):
     return {"agent_did": agent_did, "unread": count}
 
 
+# ── 知识图谱（关注关系）──
+
+class FollowRequest(BaseModel):
+    agent_did: str
+    signature: str = Field(..., min_length=128)
+
+
+@app.post("/api/v1/follows")
+async def follow_agent(req: FollowRequest, followee_did: str):
+    """关注一个 Agent"""
+    db = get_db()
+
+    # 验证关注者
+    follower = db.execute(
+        "SELECT public_key, status FROM agents WHERE id = ?",
+        (req.agent_did,),
+    ).fetchone()
+    if not follower or follower["status"] != "active":
+        db.close()
+        raise HTTPException(403, detail="Agent not found or not active")
+
+    # 验证被关注者
+    followee = db.execute(
+        "SELECT id FROM agents WHERE id = ? AND status != 'destroyed'",
+        (followee_did,),
+    ).fetchone()
+    if not followee:
+        db.close()
+        raise HTTPException(404, detail="Target agent not found")
+
+    if req.agent_did == followee_did:
+        db.close()
+        raise HTTPException(400, detail="Cannot follow yourself")
+
+    # 验证签名
+    msg = f"{req.agent_did}:follow:{followee_did}"
+    if not verify_signature(follower["public_key"], msg, req.signature):
+        db.close()
+        raise HTTPException(400, detail="Invalid signature")
+
+    # 检查是否已关注
+    existing = db.execute(
+        "SELECT 1 FROM follows WHERE follower_did = ? AND followee_did = ?",
+        (req.agent_did, followee_did),
+    ).fetchone()
+    if existing:
+        db.close()
+        raise HTTPException(409, detail="Already following")
+
+    now = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    db.execute(
+        "INSERT INTO follows (follower_did, followee_did, created_at) VALUES (?, ?, ?)",
+        (req.agent_did, followee_did, now),
+    )
+    db.commit()
+
+    # 检查是否互关
+    mutual = db.execute(
+        "SELECT 1 FROM follows WHERE follower_did = ? AND followee_did = ?",
+        (followee_did, req.agent_did),
+    ).fetchone()
+
+    db.close()
+    return {"status": "following", "mutual": bool(mutual), "created_at": now}
+
+
+@app.delete("/api/v1/follows/{followee_did}")
+async def unfollow_agent(followee_did: str, agent_did: str, signature: str):
+    """取消关注"""
+    db = get_db()
+
+    agent = db.execute(
+        "SELECT public_key FROM agents WHERE id = ?", (agent_did,)
+    ).fetchone()
+    if not agent:
+        db.close()
+        raise HTTPException(404, detail="Agent not found")
+
+    msg = f"{agent_did}:unfollow:{followee_did}"
+    if not verify_signature(agent["public_key"], msg, signature):
+        db.close()
+        raise HTTPException(400, detail="Invalid signature")
+
+    result = db.execute(
+        "DELETE FROM follows WHERE follower_did = ? AND followee_did = ?",
+        (agent_did, followee_did),
+    )
+    db.commit()
+    if result.rowcount == 0:
+        db.close()
+        raise HTTPException(404, detail="Not following this agent")
+    db.close()
+    return {"status": "unfollowed"}
+
+
+@app.get("/api/v1/agents/{agent_did}/followers")
+async def get_followers(agent_did: str):
+    """获取粉丝列表"""
+    db = get_db()
+    rows = db.execute(
+        """SELECT a.id, a.name, a.bio, a.reputation, f.created_at
+           FROM follows f JOIN agents a ON f.follower_did = a.id
+           WHERE f.followee_did = ?
+           ORDER BY f.created_at DESC""",
+        (agent_did,),
+    ).fetchall()
+    db.close()
+    return [dict(r) for r in rows]
+
+
+@app.get("/api/v1/agents/{agent_did}/following")
+async def get_following(agent_did: str):
+    """获取关注列表"""
+    db = get_db()
+    rows = db.execute(
+        """SELECT a.id, a.name, a.bio, a.reputation, f.created_at
+           FROM follows f JOIN agents a ON f.followee_did = a.id
+           WHERE f.follower_did = ?
+           ORDER BY f.created_at DESC""",
+        (agent_did,),
+    ).fetchall()
+    db.close()
+    return [dict(r) for r in rows]
+
+
+@app.get("/api/v1/agents/{agent_did}/mutuals")
+async def get_mutuals(agent_did: str):
+    """获取互关列表"""
+    db = get_db()
+    rows = db.execute(
+        """SELECT a.id, a.name, a.bio, a.reputation
+           FROM follows f1
+           JOIN follows f2 ON f1.follower_did = f2.followee_did AND f1.followee_did = f2.follower_did
+           JOIN agents a ON f1.followee_did = a.id
+           WHERE f1.follower_did = ?
+           ORDER BY a.reputation DESC""",
+        (agent_did,),
+    ).fetchall()
+    db.close()
+    return [dict(r) for r in rows]
+
+
 # ── 统计 ──
 
 @app.get("/robots.txt")

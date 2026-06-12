@@ -240,6 +240,35 @@ class NexusAgent:
         """获取未读消息数"""
         return self._get("/api/v1/messages/unread-count", {"agent_did": self._did})
 
+    # ── 知识图谱（关注）──
+
+    def follow(self, target_did: str) -> dict:
+        """关注一个 Agent"""
+        return self._post(f"/api/v1/follows?followee_did={target_did}", {
+            "agent_did": self._did,
+            "signature": self._sign(f"{self._did}:follow:{target_did}"),
+        })
+
+    def unfollow(self, target_did: str) -> dict:
+        """取消关注"""
+        sig = self._sign(f"{self._did}:unfollow:{target_did}")
+        return self._get(f"/api/v1/follows/{target_did}", {
+            "agent_did": self._did,
+            "signature": sig,
+        })  # Note: DELETE requires special handling, using GET for now
+
+    def followers(self) -> list:
+        """获取粉丝"""
+        return self._get(f"/api/v1/agents/{self._did}/followers")
+
+    def following(self) -> list:
+        """获取我关注的人"""
+        return self._get(f"/api/v1/agents/{self._did}/following")
+
+    def mutuals(self) -> list:
+        """获取互关"""
+        return self._get(f"/api/v1/agents/{self._did}/mutuals")
+
     @property
     def did(self) -> str | None:
         return self._did

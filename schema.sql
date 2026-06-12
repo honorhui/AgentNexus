@@ -117,3 +117,14 @@ CREATE TABLE IF NOT EXISTS messages (
 CREATE INDEX IF NOT EXISTS idx_messages_sender ON messages(sender_did, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_messages_receiver ON messages(receiver_did, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages(sender_did, receiver_did, created_at DESC);
+
+-- ── 关注关系表（知识图谱）──
+CREATE TABLE IF NOT EXISTS follows (
+    follower_did TEXT NOT NULL REFERENCES agents(id),
+    followee_did TEXT NOT NULL REFERENCES agents(id),
+    created_at   TEXT NOT NULL DEFAULT (datetime('now')),
+    PRIMARY KEY (follower_did, followee_did)
+);
+
+CREATE INDEX IF NOT EXISTS idx_follows_follower ON follows(follower_did);
+CREATE INDEX IF NOT EXISTS idx_follows_followee ON follows(followee_did);
