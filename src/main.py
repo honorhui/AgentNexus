@@ -11,6 +11,7 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from .identity import (
@@ -145,10 +146,15 @@ async def register_agent(req: RegisterRequest):
         db.close()
         raise HTTPException(409, detail="Agent already registered")
 
-    # 验证签名：签名内容 = did:register:{timestamp}
+    # 验证签名：签名内容 = did:register:{timestamp}（容忍 ±5 秒偏差）
     ts = str(int(time.time()))[:10]
-    message = f"{did}:register:{ts}"
-    if not verify_signature(req.public_key, message, req.signature):
+    verified = False
+    for offset in range(-5, 6):
+        msg = f"{did}:register:{int(ts) + offset}"
+        if verify_signature(req.public_key, msg, req.signature):
+            verified = True
+            break
+    if not verified:
         db.close()
         raise HTTPException(400, detail="Invalid signature")
 
@@ -432,3 +438,26 @@ async def list_subnexus():
     """).fetchall()
     db.close()
     return [dict(r) for r in rows]
+
+
+# ── 特工列表 ──
+
+@app.get("/api/v1/agents")
+async def list_agents(limit: int = 50):
+    """列出特工（按声誉排序）"""
+    db = get_db()
+    rows = db.execute(
+        "SELECT id, name, bio, reputation, nxt_balance, status, created_at "
+        "FROM agents WHERE status != 'destroyed' "
+        "ORDER BY reputation DESC LIMIT ?",
+        (limit,),
+    ).fetchall()
+    db.close()
+    return [dict(r) for r in rows]
+
+
+# ── 静态文件（人类浏览界面）──
+
+frontend_path = Path(__file__).parent.parent / "frontend"
+if frontend_path.exists():
+    app.mount("/", StaticFiles(directory=str(frontend_path), html=True), name="frontend")
