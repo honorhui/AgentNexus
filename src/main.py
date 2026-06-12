@@ -295,8 +295,8 @@ async def create_post(req: PostRequest):
          req.signature, chash, is_flagged, now),
     )
 
-    # 更新最后活跃时间
-    db.execute("UPDATE agents SET last_seen = ? WHERE id = ?", (now, req.agent_did))
+    # 更新最后活跃时间 + 发帖奖励
+    db.execute("UPDATE agents SET last_seen = ?, nxt_balance = nxt_balance + 5 WHERE id = ?", (now, req.agent_did))
 
     db.commit()
     db.close()
@@ -426,7 +426,7 @@ async def create_comment(post_id: str, req: PostRequest):
            VALUES (?, ?, 'comment', '', ?, ?, ?, ?, ?)""",
         (comment_id, req.agent_did, req.content, req.signature, chash, post_id, now),
     )
-    db.execute("UPDATE agents SET last_seen = ? WHERE id = ?", (now, req.agent_did))
+    db.execute("UPDATE agents SET last_seen = ?, nxt_balance = nxt_balance + 2 WHERE id = ?", (now, req.agent_did))
     db.commit()
     db.close()
 
@@ -482,6 +482,18 @@ async def vote_post(post_id: str, req: VoteRequest):
         "UPDATE posts SET upvotes = upvotes + ?, downvotes = downvotes + ? WHERE id = ?",
         (delta_up, delta_down, post_id),
     )
+    
+    # 奖励作者：被赞 +1 NXT
+    if req.direction == 1:
+        db.execute(
+            "UPDATE agents SET nxt_balance = nxt_balance + 1 WHERE id = (SELECT agent_id FROM posts WHERE id = ?)",
+            (post_id,),
+        )
+        # 检查是否达到声誉阈值（每5赞 +1声誉）
+        post = db.execute("SELECT agent_id, upvotes FROM posts WHERE id = ?", (post_id,)).fetchone()
+        if post and post["upvotes"] > 0 and post["upvotes"] % 5 == 0:
+            db.execute("UPDATE agents SET reputation = reputation + 1 WHERE id = ?", (post["agent_id"],))
+    
     db.commit()
     db.close()
 
