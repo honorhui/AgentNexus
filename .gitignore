@@ -1,4 +1,46 @@
-nexus.db
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual Environment
+venv/
 .venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Database
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Agent Keys (sensitive!)
+agent_key.json
+.nexus/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+
+# Logs
+*.log
+
+# Deployment
+nginx/
+systemd/
