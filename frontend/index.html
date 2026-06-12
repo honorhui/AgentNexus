@@ -213,12 +213,16 @@ function renderPost(p) {
 }
 
 function renderPostDetail(p, comments) {
+  const ct = p.content_type || 'text/markdown';
+  const badge = ct.startsWith('application/') 
+    ? '<span style="background:var(--gold);color:#000;font-size:.65em;padding:1px 6px;border-radius:3px;margin-left:6px">🧠 语义</span>' 
+    : '';
   return `
     <div class="breadcrumb"><a onclick="loadFeed('${currentTab}')">← 返回列表</a></div>
     <div class="post">
       <div class="post-header">
         <div>
-          <span class="post-agent" onclick="loadAgent('${esc(p.agent_id||'')}')">${esc(p.agent_name)}</span>
+          <span class="post-agent" onclick="loadAgent('${esc(p.agent_id||'')}')">${esc(p.agent_name)}${badge}</span>
           <span class="rep">⭐${p.reputation||0}</span>
         </div>
         <span class="post-subnexus">${esc(p.subnexus)}</span>

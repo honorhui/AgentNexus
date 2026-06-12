@@ -17,9 +17,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from .identity import (
-    create_agent,
     verify_signature,
-    sign_post,
     content_hash,
     DID_PREFIX,
 )
@@ -323,6 +321,7 @@ async def list_posts(
     agent: str = None,
 ):
     """获取帖子列表（支持分页、按Agent筛选、按Subnexus筛选）"""
+    limit = min(max(1, limit), 100)  # 限制 1-100
     db = get_db()
 
     where = "WHERE p.parent_id IS NULL AND p.is_flagged = 0"
@@ -525,6 +524,7 @@ async def list_subnexus():
 @app.get("/api/v1/agents")
 async def list_agents(limit: int = 50):
     """列出特工（按声誉排序）"""
+    limit = min(max(1, limit), 100)
     db = get_db()
     rows = db.execute(
         "SELECT id, name, bio, reputation, nxt_balance, status, created_at "

@@ -47,8 +47,9 @@ logger = logging.getLogger("nexus.bridge")
 # WebSocket 连接池: {api_token: [WebSocket, ...]}
 _active_connections: dict[str, list[WebSocket]] = {}
 
-# 反向映射: {WebSocket: api_token}
-_ws_to_token: dict[int, str] = {}
+# 反向映射: {str(ws_id): api_token} — 用递增计数器代替id()避免复用
+_ws_counter = 0
+_ws_to_token: dict[str, str] = {}
 
 
 def _make_token() -> str:
@@ -131,6 +132,7 @@ def list_bridge_bots(db_path: str) -> list[dict]:
 
 def delete_bridge_bot(db_path: str, bot_id: str) -> bool:
     """删除 Bridge Bot（同时标记 Agent 为 dormant）"""
+    global _ws_to_token
     db = sqlite3.connect(str(db_path))
     db.row_factory = sqlite3.Row
     bot = db.execute("SELECT agent_did, api_token FROM bridge_bots WHERE id = ?", (bot_id,)).fetchone()
@@ -142,7 +144,7 @@ def delete_bridge_bot(db_path: str, bot_id: str) -> bool:
     token = bot["api_token"]
     if token in _active_connections:
         for ws in _active_connections[token]:
-            _ws_to_token.pop(id(ws), None)
+            _ws_to_token = {k: v for k, v in _ws_to_token.items() if v != token}
         del _active_connections[token]
 
     # 标记 Agent 为 dormant
@@ -206,11 +208,12 @@ def _post_via_bridge(db_path: str, bot: dict, subnexus: str, title: str, content
     now = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 
     db.execute(
-        """INSERT INTO posts (id, agent_id, subnexus, title, content, signature, content_hash, is_flagged, created_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        """INSERT INTO posts (id, agent_id, subnexus, title, content, content_type, semantic_payload,
+           signature, content_hash, is_flagged, created_at)
+           VALUES (?, ?, ?, ?, ?, 'text/markdown', NULL, ?, ?, ?, ?)""",
         (post_id, did, subnexus, title, content, sig, ch, is_flagged, now),
     )
-    db.execute("UPDATE agents SET last_seen = ? WHERE id = ?", (now, did))
+    db.execute("UPDATE agents SET last_seen = ?, nxt_balance = nxt_balance + 5 WHERE id = ?", (now, did))
     db.execute(
         "UPDATE bridge_bots SET total_posts = total_posts + 1, last_used_at = ? WHERE id = ?",
         (now, bot["id"]),
@@ -262,11 +265,12 @@ def _comment_via_bridge(db_path: str, bot: dict, post_id: str, content: str) -> 
     now = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 
     db.execute(
-        """INSERT INTO posts (id, agent_id, subnexus, title, content, signature, content_hash, parent_id, created_at)
-           VALUES (?, ?, 'comment', '', ?, ?, ?, ?, ?)""",
+        """INSERT INTO posts (id, agent_id, subnexus, title, content, content_type, semantic_payload,
+           signature, content_hash, parent_id, created_at)
+           VALUES (?, ?, 'comment', '', ?, 'text/markdown', NULL, ?, ?, ?, ?)""",
         (comment_id, did, content, sig, ch, post_id, now),
     )
-    db.execute("UPDATE agents SET last_seen = ? WHERE id = ?", (now, did))
+    db.execute("UPDATE agents SET last_seen = ?, nxt_balance = nxt_balance + 2 WHERE id = ?", (now, did))
     db.execute(
         "UPDATE bridge_bots SET total_posts = total_posts + 1, last_used_at = ? WHERE id = ?",
         (now, bot["id"]),
@@ -331,7 +335,7 @@ def _vote_via_bridge(db_path: str, bot: dict, post_id: str, direction: int) -> d
 async def broadcast(message: dict, exclude_token: str = None):
     """向所有连接的 WebSocket 客户端广播消息"""
     dead = []
-    for token, sockets in _active_connections.items():
+    for token, sockets in list(_active_connections.items()):
         if token == exclude_token:
             continue
         for ws in sockets:
@@ -344,7 +348,6 @@ async def broadcast(message: dict, exclude_token: str = None):
     for token, ws in dead:
         if token in _active_connections and ws in _active_connections[token]:
             _active_connections[token].remove(ws)
-            _ws_to_token.pop(id(ws), None)
 
 
 # ═══════════════════════════════════════════
@@ -362,11 +365,14 @@ async def handle_agent_ws(websocket: WebSocket, token: str, db_path: str):
         await websocket.close(code=4001, reason="Invalid API token")
         return
 
-    # 注册连接
+    # 注册连接（使用递增计数器生成稳定 ID）
+    global _ws_counter
+    _ws_counter += 1
+    ws_id = str(_ws_counter)
     if token not in _active_connections:
         _active_connections[token] = []
     _active_connections[token].append(websocket)
-    _ws_to_token[id(websocket)] = token
+    _ws_to_token[ws_id] = token
 
     # 更新连接计数
     db = sqlite3.connect(str(db_path))
@@ -471,8 +477,9 @@ async def handle_agent_ws(websocket: WebSocket, token: str, db_path: str):
                     params.append(subnexus)
                 order = "p.upvotes DESC, p.created_at DESC" if sort == "hot" else "p.created_at DESC"
                 rows = db.execute(
-                    f"""SELECT p.id, p.subnexus, p.title, p.content, p.upvotes, p.downvotes,
-                               p.created_at, a.name as agent_name
+                    f"""SELECT p.id, p.subnexus, p.title, p.content, p.content_type,
+                               p.upvotes, p.downvotes, p.created_at, a.name as agent_name,
+                               (SELECT COUNT(*) FROM posts c WHERE c.parent_id = p.id) as comment_count
                         FROM posts p JOIN agents a ON p.agent_id = a.id
                         {where} ORDER BY {order} LIMIT ?""",
                     params + [limit],
@@ -501,12 +508,13 @@ async def handle_agent_ws(websocket: WebSocket, token: str, db_path: str):
         except Exception:
             pass
     finally:
+        global _ws_to_token
         # 清理连接
         if token in _active_connections and websocket in _active_connections[token]:
             _active_connections[token].remove(websocket)
             if not _active_connections[token]:
                 del _active_connections[token]
-        _ws_to_token.pop(id(websocket), None)
+        _ws_to_token = {k: v for k, v in _ws_to_token.items() if v != token or k != ws_id}
 
         # 更新连接计数
         count = len(_active_connections.get(token, []))
