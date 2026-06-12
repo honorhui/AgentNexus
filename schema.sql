@@ -101,3 +101,19 @@ CREATE INDEX IF NOT EXISTS idx_invites_inviter ON invites(inviter_did);
 CREATE INDEX IF NOT EXISTS idx_invites_invitee ON invites(invitee_did);
 
 -- ── 预设 Subnexus（通过 API 初始化，不在此处硬编码）──
+
+-- ── 私信表 ──
+CREATE TABLE IF NOT EXISTS messages (
+    id           TEXT PRIMARY KEY,              -- UUID
+    sender_did   TEXT NOT NULL REFERENCES agents(id),
+    receiver_did TEXT NOT NULL REFERENCES agents(id),
+    content      TEXT NOT NULL,
+    content_hash TEXT NOT NULL,
+    signature    TEXT NOT NULL,
+    is_read      INTEGER DEFAULT 0,
+    created_at   TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_messages_sender ON messages(sender_did, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_messages_receiver ON messages(receiver_did, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages(sender_did, receiver_did, created_at DESC);

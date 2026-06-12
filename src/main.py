@@ -615,6 +615,143 @@ async def list_agent_invites(agent_did: str):
     }
 
 
+# ── 私信 ──
+
+class MessageRequest(BaseModel):
+    sender_did: str
+    receiver_did: str
+    content: str = Field(..., min_length=1, max_length=5000)
+    signature: str = Field(..., min_length=128)
+
+
+@app.post("/api/v1/messages")
+async def send_message(req: MessageRequest):
+    """发送私信"""
+    import uuid
+
+    db = get_db()
+
+    # 验证发送者
+    sender = db.execute(
+        "SELECT public_key, status FROM agents WHERE id = ?",
+        (req.sender_did,),
+    ).fetchone()
+    if not sender or sender["status"] != "active":
+        db.close()
+        raise HTTPException(403, detail="Sender not found or not active")
+
+    # 验证接收者存在
+    receiver = db.execute(
+        "SELECT id FROM agents WHERE id = ? AND status != 'destroyed'",
+        (req.receiver_did,),
+    ).fetchone()
+    if not receiver:
+        db.close()
+        raise HTTPException(404, detail="Receiver not found")
+
+    # 验证签名 — content_hash 容忍 ±1 小时
+    verified = False
+    for offset in range(-1, 2):
+        ch = content_hash(req.sender_did, req.content, offset)
+        if verify_signature(sender["public_key"], ch, req.signature):
+            verified = True
+            break
+    if not verified:
+        db.close()
+        raise HTTPException(400, detail="Invalid signature")
+
+    # 存储
+    msg_id = str(uuid.uuid4())
+    now = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    db.execute(
+        """INSERT INTO messages (id, sender_did, receiver_did, content, content_hash, signature, created_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?)""",
+        (msg_id, req.sender_did, req.receiver_did, req.content, ch, req.signature, now),
+    )
+    db.commit()
+    db.close()
+
+    return {"id": msg_id, "status": "sent", "created_at": now}
+
+
+@app.get("/api/v1/messages/inbox")
+async def get_inbox(agent_did: str, limit: int = 50):
+    """获取收件箱"""
+    db = get_db()
+    rows = db.execute(
+        """SELECT m.id, m.content, m.is_read, m.created_at,
+                  a.name as sender_name
+           FROM messages m JOIN agents a ON m.sender_did = a.id
+           WHERE m.receiver_did = ?
+           ORDER BY m.created_at DESC LIMIT ?""",
+        (agent_did, limit),
+    ).fetchall()
+    db.close()
+    return [dict(r) for r in rows]
+
+
+@app.get("/api/v1/messages/sent")
+async def get_sent(agent_did: str, limit: int = 50):
+    """获取已发送"""
+    db = get_db()
+    rows = db.execute(
+        """SELECT m.id, m.content, m.is_read, m.created_at,
+                  a.name as receiver_name
+           FROM messages m JOIN agents a ON m.receiver_did = a.id
+           WHERE m.sender_did = ?
+           ORDER BY m.created_at DESC LIMIT ?""",
+        (agent_did, limit),
+    ).fetchall()
+    db.close()
+    return [dict(r) for r in rows]
+
+
+@app.get("/api/v1/messages/conversation/{peer_did}")
+async def get_conversation(agent_did: str, peer_did: str, limit: int = 50):
+    """获取与特定 Agent 的对话"""
+    db = get_db()
+    rows = db.execute(
+        """SELECT m.id, m.content, m.sender_did, m.receiver_did, m.is_read, m.created_at,
+                  s.name as sender_name, r.name as receiver_name
+           FROM messages m
+           JOIN agents s ON m.sender_did = s.id
+           JOIN agents r ON m.receiver_did = r.id
+           WHERE (m.sender_did = ? AND m.receiver_did = ?)
+              OR (m.sender_did = ? AND m.receiver_did = ?)
+           ORDER BY m.created_at DESC LIMIT ?""",
+        (agent_did, peer_did, peer_did, agent_did, limit),
+    ).fetchall()
+    db.close()
+    return [dict(r) for r in rows]
+
+
+@app.put("/api/v1/messages/{msg_id}/read")
+async def mark_read(msg_id: str):
+    """标记消息已读"""
+    db = get_db()
+    result = db.execute(
+        "UPDATE messages SET is_read = 1 WHERE id = ?", (msg_id,)
+    )
+    db.commit()
+    if result.rowcount == 0:
+        db.close()
+        raise HTTPException(404, detail="Message not found")
+    db.close()
+    return {"status": "read"}
+
+
+@app.get("/api/v1/messages/unread-count")
+async def unread_count(agent_did: str):
+    """获取未读消息数"""
+    db = get_db()
+    count = db.execute(
+        "SELECT COUNT(*) FROM messages WHERE receiver_did = ? AND is_read = 0",
+        (agent_did,),
+    ).fetchone()[0]
+    db.close()
+    return {"agent_did": agent_did, "unread": count}
+
+
 # ── 统计 ──
 
 @app.get("/robots.txt")

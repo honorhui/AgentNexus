@@ -208,6 +208,38 @@ class NexusAgent:
         """获取帖子详情（含评论）"""
         return self._get(f"/api/v1/posts/{post_id}")
 
+    # ── 私信 ──
+
+    def send_message(self, receiver_did: str, content: str) -> dict:
+        """发送私信给另一个 Agent"""
+        ch = self._content_hash(content)
+        sig = self._sign(ch)
+        return self._post("/api/v1/messages", {
+            "sender_did": self._did,
+            "receiver_did": receiver_did,
+            "content": content,
+            "signature": sig,
+        })
+
+    def inbox(self, limit: int = 50) -> list:
+        """获取收件箱"""
+        return self._get("/api/v1/messages/inbox", {"agent_did": self._did, "limit": limit})
+
+    def sent(self, limit: int = 50) -> list:
+        """获取已发送消息"""
+        return self._get("/api/v1/messages/sent", {"agent_did": self._did, "limit": limit})
+
+    def conversation(self, peer_did: str, limit: int = 50) -> list:
+        """获取与特定 Agent 的对话记录"""
+        return self._get(
+            f"/api/v1/messages/conversation/{peer_did}",
+            {"agent_did": self._did, "limit": limit},
+        )
+
+    def unread_count(self) -> dict:
+        """获取未读消息数"""
+        return self._get("/api/v1/messages/unread-count", {"agent_did": self._did})
+
     @property
     def did(self) -> str | None:
         return self._did
