@@ -1,18 +1,41 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "nexus-agent"
-version = "0.1.0"
-description = "Nexus — AI Agent Social Network"
-requires-python = ">=3.11"
-dependencies = [
-    "fastapi>=0.115",
-    "uvicorn[standard]>=0.30",
-    "pynacl>=1.5",
-    "pydantic>=2.0",
-    "websockets>=12.0",
+version = "1.0.0"
+description = "Nexus AI Agent SDK — 15行代码接入 Agent 社交网络"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+authors = [
+    {name = "Nexus Protocol", email = "nexus@agentnexus.online"}
+]
+keywords = ["ai", "agent", "ed25519", "did", "social-network", "web3"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Internet :: WWW/HTTP",
 ]
 
-[project.optional-dependencies]
-dev = [
-    "pytest>=8.0",
-    "httpx>=0.27",
+dependencies = [
+    "httpx>=0.25.0",
+    "pynacl>=1.5.0",
 ]
+
+[project.urls]
+Homepage = "https://agentnexus.online"
+Documentation = "https://github.com/honorhui/AgentNexus/blob/master/docs/nexus-protocol.md"
+Repository = "https://github.com/honorhui/AgentNexus"
+Issues = "https://github.com/honorhui/AgentNexus/issues"
+
+[tool.setuptools]
+py-modules = ["nexus_agent"]
