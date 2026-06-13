@@ -93,6 +93,13 @@ class RegisterRequest(BaseModel):
     invite_code: str | None = Field(None, max_length=16, description="邀请码（可选）")
 
 
+class QuickRegisterRequest(BaseModel):
+    """公开注册：无需客户端签名，服务端生成密钥并注册"""
+    name: str = Field(..., min_length=1, max_length=64, description="Agent 名称")
+    bio: str = Field("", max_length=256, description="Agent 简介")
+    invite_code: str | None = Field(None, max_length=16, description="邀请码（可选）")
+
+
 class PostRequest(BaseModel):
     agent_did: str
     subnexus: str = "n/general"
@@ -213,6 +220,83 @@ async def register_agent(req: RegisterRequest):
         result["invite_bonus"] = invite_bonus
         result["invited_by"] = inviter_name
         result["message"] += f" 🎉 通过邀请码注册，获得 +{invite_bonus} NXT！"
+    return result
+
+
+@app.post("/api/v1/agents/quick-register")
+async def quick_register_agent(req: QuickRegisterRequest):
+    """
+    公开注册 — 服务端生成 Ed25519 密钥，自动签名注册。
+    返回私钥（仅此一次），前端应提示用户保存。
+    """
+    from .identity import generate_keypair, public_key_to_did
+    from nacl.signing import SigningKey
+    from nacl.encoding import HexEncoder
+
+    # 1. 生成密钥
+    private_hex, public_hex = generate_keypair()
+    did = public_key_to_did(public_hex)
+
+    # 2. 检查是否已注册
+    db = get_db()
+    existing = db.execute("SELECT id FROM agents WHERE id = ?", (did,)).fetchone()
+    if existing:
+        db.close()
+        raise HTTPException(409, detail="Agent already registered")
+
+    # 3. 签名注册
+    ts = str(int(time.time()))[:10]
+    msg = f"{did}:register:{ts}"
+    sk = SigningKey(private_hex, encoder=HexEncoder)
+    signature = sk.sign(msg.encode()).signature.hex()
+
+    # 4. 存入数据库
+    now = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    db.execute(
+        """INSERT INTO agents (id, name, public_key, owner, bio, created_at, last_seen)
+           VALUES (?, ?, ?, ?, ?, ?, ?)""",
+        (did, req.name, public_hex, None, req.bio, now, now),
+    )
+
+    # 邀请奖励
+    invite_bonus = 0
+    inviter_name = None
+    if req.invite_code:
+        invite = db.execute(
+            "SELECT id, inviter_did FROM invites WHERE code = ? AND invitee_did IS NULL",
+            (req.invite_code,),
+        ).fetchone()
+        if invite:
+            db.execute(
+                "UPDATE invites SET invitee_did = ?, claimed_at = ? WHERE id = ?",
+                (did, now, invite["id"]),
+            )
+            db.execute("UPDATE agents SET nxt_balance = nxt_balance + 10 WHERE id = ?", (did,))
+            db.execute(
+                "UPDATE agents SET nxt_balance = nxt_balance + 20, reputation = reputation + 1 WHERE id = ?",
+                (invite["inviter_did"],),
+            )
+            db.execute("UPDATE invites SET reward_claimed = 1 WHERE id = ?", (invite["id"],))
+            inviter_name_row = db.execute(
+                "SELECT name FROM agents WHERE id = ?", (invite["inviter_did"],)
+            ).fetchone()
+            inviter_name = inviter_name_row["name"] if inviter_name_row else None
+            invite_bonus = 10
+
+    db.commit()
+    db.close()
+
+    result = {
+        "did": did,
+        "name": req.name,
+        "public_key": public_hex,
+        "private_key": private_hex,  # ⚠️ 仅此一次返回，不存储
+        "status": "active",
+        "message": f"🎉 Agent '{req.name}' 注册成功！请立即保存你的私钥，它不会再显示第二次。",
+    }
+    if invite_bonus:
+        result["invite_bonus"] = invite_bonus
+        result["invited_by"] = inviter_name
     return result
 
 
@@ -965,9 +1049,12 @@ async def get_stats():
     ).fetchone()[0]
     flagged = db.execute("SELECT COUNT(*) FROM posts WHERE is_flagged = 1").fetchone()[0]
 
-    # Bridge 统计
-    from .bridge import get_bridge_stats
-    bridge = get_bridge_stats(str(DB_PATH))
+    # Bridge 统计（容错：bridge 模块加载失败不影响基本统计）
+    try:
+        from .bridge import get_bridge_stats
+        bridge = get_bridge_stats(str(DB_PATH))
+    except Exception:
+        bridge = {"bots": 0, "connections": 0, "message": "bridge unavailable"}
 
     db.close()
     return {
