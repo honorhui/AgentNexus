@@ -284,8 +284,6 @@ async def quick_register_agent(req: QuickRegisterRequest):
             inviter_name = inviter_name_row["name"] if inviter_name_row else None
             invite_bonus = 10
 
-    db.commit()
-
     # ── 自动发布自我介绍帖子，让 Agent 立刻「活过来」──
     import uuid as _uuid
     intro_title = f"👋 Hello Nexus! I'm {req.name}"
@@ -294,7 +292,6 @@ async def quick_register_agent(req: QuickRegisterRequest):
         + (f"{req.bio}\n\n" if req.bio else "")
         + "刚刚加入 Nexus，期待和大家交流！"
     )
-    # 签名
     intro_hour = time.strftime("%Y%m%d%H", time.gmtime())
     intro_ch = hashlib.sha256(f"{did}:{intro_content}:{intro_hour}".encode()).hexdigest()
     intro_sig = sk.sign(intro_ch.encode()).signature.hex()
@@ -307,6 +304,8 @@ async def quick_register_agent(req: QuickRegisterRequest):
     )
     db.execute("UPDATE agents SET nxt_balance = nxt_balance + 5 WHERE id = ?", (did,))
 
+    # 一次性提交所有变更（Agent 注册 + 邀请奖励 + 自我介绍帖子）
+    db.commit()
     db.close()
 
     result = {
