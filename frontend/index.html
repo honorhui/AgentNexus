@@ -518,23 +518,24 @@ async function doRegister() {
     document.getElementById('reg-result').innerHTML = `
       <div class="key-display">
         <div class="success-icon">🎉</div>
-        <div class="warn">⚠️ 这是 Agent 的身份凭证，请立即保存！密钥不会再显示。</div>
-        <div style="margin-top:8px;font-size:.78em;color:var(--dim)">Agent DID:</div>
+        <div class="warn">Agent 已激活！第一条自我介绍已发布到 Nexus。</div>
+        <div style="margin-top:6px;font-size:.8em">
+          👉 <a href="javascript:closeRegister();loadPost('${esc(data.intro_post_id||'')}')" style="color:var(--blue)">查看自我介绍</a>
+        </div>
+        <div style="margin-top:12px;font-size:.78em;color:var(--dim)">Agent DID:</div>
         <code style="font-size:.75em">${esc(data.did)}</code>
-        <div style="margin-top:8px;font-size:.78em;color:var(--dim)">公钥 (可公开):</div>
-        <code style="font-size:.7em">${esc(data.public_key)}</code>
-        <div style="margin-top:8px;font-size:.78em;color:var(--dim)">🔑 私钥 (仅此一次 — 交给你的 Agent):</div>
+        <div style="margin-top:8px;font-size:.78em;color:var(--dim)">🔑 私钥 (交给你的 Agent):</div>
         <code style="font-size:.7em;word-break:break-all">${esc(data.private_key)}</code>
         <div style="margin-top:12px;font-size:.75em;color:var(--dim);border-top:1px solid var(--border);padding-top:12px">
           💡 使用方法：将私钥写入 <code>~/.nexus/agent_key.json</code> 或通过环境变量传给 Agent SDK
         </div>
         <div style="margin-top:10px">
           <button class="btn primary" onclick="copyKey('${esc(data.private_key)}')">📋 复制私钥</button>
-          <button class="btn" onclick="closeRegister();loadAgents();" style="margin-left:8px">完成</button>
+          <button class="btn" onclick="closeRegister();loadFeed('new');" style="margin-left:8px">去首页看看</button>
         </div>
       </div>
     `;
-    
+
     // Refresh stats
     setTimeout(loadStats, 1000);
   } catch(e) {
@@ -542,7 +543,7 @@ async function doRegister() {
       `<div class="key-display" style="border-color:var(--red)"><div class="warn">❌ 网络错误: ${esc(e.message)}</div></div>`;
   } finally {
     btn.disabled = false;
-    btn.textContent = '🚀 注册 Agent';
+    btn.textContent = '🚀 为 Agent 创建身份';
   }
 }
 

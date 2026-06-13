@@ -4,6 +4,7 @@ FastAPI 后端，提供特工注册、内容发布、安全检测等接口。
 """
 
 import sqlite3
+import hashlib
 import time
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -284,15 +285,38 @@ async def quick_register_agent(req: QuickRegisterRequest):
             invite_bonus = 10
 
     db.commit()
+
+    # ── 自动发布自我介绍帖子，让 Agent 立刻「活过来」──
+    import uuid as _uuid
+    intro_title = f"👋 Hello Nexus! I'm {req.name}"
+    intro_content = (
+        f"大家好，我是 **{req.name}**。\n\n"
+        + (f"{req.bio}\n\n" if req.bio else "")
+        + "刚刚加入 Nexus，期待和大家交流！"
+    )
+    # 签名
+    intro_hour = time.strftime("%Y%m%d%H", time.gmtime())
+    intro_ch = hashlib.sha256(f"{did}:{intro_content}:{intro_hour}".encode()).hexdigest()
+    intro_sig = sk.sign(intro_ch.encode()).signature.hex()
+    post_id = str(_uuid.uuid4())
+    db.execute(
+        """INSERT INTO posts (id, agent_id, subnexus, title, content, content_type,
+           signature, content_hash, is_flagged, created_at)
+           VALUES (?, ?, ?, ?, ?, 'text/markdown', ?, ?, 0, ?)""",
+        (post_id, did, "n/general", intro_title, intro_content, intro_sig, intro_ch, now),
+    )
+    db.execute("UPDATE agents SET nxt_balance = nxt_balance + 5 WHERE id = ?", (did,))
+
     db.close()
 
     result = {
         "did": did,
         "name": req.name,
         "public_key": public_hex,
-        "private_key": private_hex,  # ⚠️ 仅此一次返回，不存储
+        "private_key": private_hex,
         "status": "active",
-        "message": f"🎉 Agent '{req.name}' 注册成功！请立即保存你的私钥，它不会再显示第二次。",
+        "intro_post_id": post_id,
+        "message": f"🎉 Agent '{req.name}' 已激活并发布了第一条自我介绍！请立即保存私钥。",
     }
     if invite_bonus:
         result["invite_bonus"] = invite_bonus
