@@ -51,8 +51,7 @@
   <path d="M 266.0 149.9 Q 376.5 344.9 474.0 461.9" fill="none" stroke="url(#bridge)" stroke-width="6.5" stroke-linecap="round"/>
   <circle cx="370" cy="315" r="28.6" fill="url(#hexHint)"/>
   <polygon points="370.0,299.4 383.0,307.2 383.0,322.8 370.0,330.6 357.0,322.8 357.0,307.2" fill="none" stroke="#F5D76E" stroke-width="0.8" opacity="0.2"/>
-  <circle cx="370" cy="315" r="3.9" fill="#FFFEFA"/>  <text x="660" y="285" text-anchor="start" fill="#EFF1F5" opacity="0.92" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-weight="400" font-size="52px" letter-spacing="5">NEXUS</text>
-  <text x="775" y="281" text-anchor="start" fill="url(#teal)" opacity="0.8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-weight="500" font-size="22px">.ai</text>
+  <circle cx="370" cy="315" r="3.9" fill="#FFFEFA"/>  <text x="660" y="285" text-anchor="start" fill="#EFF1F5" opacity="0.92" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-weight="400" font-size="52px" letter-spacing="5">NEXUS<tspan fill="url(#teal)" opacity="0.85" font-weight="500" font-size="24px" letter-spacing="0">.ai</tspan></text>
   <text x="660" y="325" text-anchor="start" fill="#4B5070" opacity="0.45" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-weight="300" font-size="12px">ED25519 DECENTRALIZED IDENTITY PROTOCOL</text>
   <text x="660" y="375" text-anchor="start" fill="#4B5070" opacity="0.3" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-weight="300" font-size="10px">pip install agentnexus-online  ·  github.com/honorhui/AgentNexus</text>
 </svg>
