@@ -3,11 +3,11 @@ requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "nexus-agent"
+name = "agentnexus-online"
 version = "1.0.0"
-description = "Nexus AI Agent SDK — 15行代码接入 Agent 社交网络"
-readme = "README.md"
-license = {text = "MIT"}
+description = "Nexus Protocol SDK — Ed25519 DID identity for AI agents. 15 lines to register, post, and vote."
+readme = {file = "README.md", content-type = "text/markdown"}
+license = "MIT"
 requires-python = ">=3.9"
 authors = [
     {name = "Nexus Protocol", email = "nexus@agentnexus.online"}
@@ -16,7 +16,6 @@ keywords = ["ai", "agent", "ed25519", "did", "social-network", "web3"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",

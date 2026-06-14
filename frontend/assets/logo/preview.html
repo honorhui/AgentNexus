@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nexus Logo — HD System</title>
+<style>
+:root{--bg:#0a0e14;--g:#2ECC71;--dim:#5c6e8a;--txt:#c8d6e5}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--txt);font-family:'PingFang SC',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:48px 20px}
+h1{font-size:1.4em;color:#fff;letter-spacing:4px;margin-bottom:6px}
+h1 span{color:var(--g)}
+.sub{color:var(--dim);font-size:.78em;margin-bottom:36px}
+.showcase{display:flex;gap:32px;flex-wrap:wrap;justify-content:center;max-width:960px}
+.card{text-align:center}
+.card .frame{display:flex;align-items:center;justify-content:center;width:140px;height:140px;border-radius:16px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05)}
+.card .frame.light{background:#eee}
+.card img{object-fit:contain}
+.card .lbl{font-size:.72em;color:var(--dim);margin-top:8px}
+.card .lbl b{color:var(--g)}
+.row{display:flex;gap:20px;margin-top:32px}
+.row img{border-radius:8px}
+.footer{color:var(--dim);font-size:.68em;margin-top:40px}
+</style>
+</head>
+<body>
+<h1>NE<span>X</span>US</h1>
+<p class="sub">Logo System · HD · 2048px 母版</p>
+
+<div class="showcase">
+  <div class="card"><div class="frame"><img src="nexus_2048px.png" width="130"></div><div class="lbl"><b>2048px</b> HD 母版</div></div>
+  <div class="card"><div class="frame"><img src="nexus_1024px.png" width="110"></div><div class="lbl"><b>1024px</b> 高清</div></div>
+  <div class="card"><div class="frame"><img src="nexus_512px.png" width="90"></div><div class="lbl"><b>512px</b> 主标识</div></div>
+  <div class="card"><div class="frame"><img src="nexus_256px.png" width="70"></div><div class="lbl"><b>256px</b> 标准</div></div>
+  <div class="card"><div class="frame"><img src="nexus_128px.png" width="50"></div><div class="lbl"><b>128px</b></div></div>
+  <div class="card"><div class="frame"><img src="nexus_64px.png" width="32"></div><div class="lbl"><b>64px</b></div></div>
+</div>
+
+<div class="showcase" style="margin-top:28px">
+  <div class="card"><div class="frame"><img src="ios_1024px.png" width="100"></div><div class="lbl"><b>1024px</b> iOS</div></div>
+  <div class="card"><div class="frame"><img src="android_512px.png" width="80"></div><div class="lbl"><b>512px</b> Android</div></div>
+  <div class="card"><div class="frame"><img src="pwa_192px.png" width="70"></div><div class="lbl"><b>192px</b> PWA</div></div>
+  <div class="card"><div class="frame"><img src="favicon_32px.png" width="32"></div><div class="lbl"><b>32px</b> Favicon</div></div>
+  <div class="card"><div class="frame"><img src="favicon_16px.png" width="16"></div><div class="lbl"><b>16px</b> Favicon</div></div>
+  <div class="card"><div class="frame"><img src="symbol_256px.png" width="70"></div><div class="lbl"><b>256px</b> 纯符号</div></div>
+</div>
+
+<div class="showcase" style="margin-top:28px">
+  <div class="card"><div class="frame light"><img src="light_400px.png" width="90"></div><div class="lbl">亮底变体</div></div>
+  <div class="card"><div class="frame"><img src="mono_400px.png" width="90"></div><div class="lbl">单色变体</div></div>
+  <div class="card"><div class="frame"><img src="app_icon_512px.png" width="80"></div><div class="lbl">App 图标</div></div>
+</div>
+
+<div class="row">
+  <img src="banner_hd.png" width="800" style="max-width:100%">
+</div>
+
+<div class="footer">Nexus Logo HD · <a href="https://agentnexus.online" style="color:var(--g)">agentnexus.online</a> · 母版 2048px SVG</div>
+</body>
+</html>
