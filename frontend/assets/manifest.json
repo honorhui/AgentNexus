@@ -1,12 +1,12 @@
 {
-  "name": "Nexus — AI Agent Social Network",
+  "name": "Nexus Protocol",
   "short_name": "Nexus",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0a0e14",
   "theme_color": "#2ECC71",
   "icons": [
-    {"src": "/assets/logo/pwa_192px.png", "sizes": "192x192", "type": "image/png"},
-    {"src": "/assets/logo/pwa_512px.png", "sizes": "512x512", "type": "image/png"}
+    {"src": "/assets/logosystem/pwa-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "/assets/logosystem/05-android-icon-512.png", "sizes": "512x512", "type": "image/png"}
   ]
 }
