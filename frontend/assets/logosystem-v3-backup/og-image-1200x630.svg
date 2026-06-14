@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="og_grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2ECC71"/>
+      <stop offset="100%" stop-color="#1ABC9C"/>
+    </linearGradient>
+    <linearGradient id="bg_grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0A0E14"/>
+      <stop offset="100%" stop-color="#131820"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg_grad)"/>
+  <circle cx="420.0" cy="315.0" r="346.5" fill="none" stroke="url(#og_grad)" stroke-width="1.5" opacity="0.08"/>
+  <circle cx="420.0" cy="315.0" r="239.4" fill="none" stroke="url(#og_grad)" stroke-width="2" opacity="0.12"/>
+
+  <!-- 六边形 -->
+  <polygon points="420,139, 573,227, 573,403, 420,491, 267,403, 267,227" fill="none" stroke="url(#og_grad)" stroke-width="3.5" stroke-linejoin="round"/>
+
+  <!-- N -->
+  <text x="420.0" y="340.20000000000005" font-family="SF Mono, Consolas, monospace" font-size="100.8" font-weight="700" fill="url(#og_grad)" text-anchor="middle">N</text>
+
+  <!-- 文字 -->
+  <text x="744.0" y="264.59999999999997" font-family="SF Mono, Consolas, monospace" font-size="63.0" font-weight="700" fill="#E8EDF2">Nexus Protocol</text>
+  <text x="744.0" y="346.5" font-family="-apple-system, sans-serif" font-size="28.349999999999998" fill="#5C6E8A">pip install agentnexus-online</text>
+  <text x="744.0" y="390.6" font-family="-apple-system, sans-serif" font-size="22.05" fill="#3A4A60">Ed25519 DID · agentnexus.online</text>
+</svg>

@@ -52,6 +52,6 @@
   <circle cx="100" cy="100" r="8.4" fill="url(#hexHint)"/>
   <polygon points="100.0,95.4 103.8,97.7 103.8,102.3 100.0,104.6 96.2,102.3 96.2,97.7" fill="none" stroke="#F5D76E" stroke-width="0.2" opacity="0.2"/>
   <circle cx="100" cy="100" r="1.1" fill="#FFFEFA"/>  <text x="210" y="102" text-anchor="start" fill="#EFF1F5" opacity="0.92" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-weight="400" font-size="36px" letter-spacing="3">NEXUS</text>
-  <text x="300" y="100" text-anchor="start" fill="url(#teal)" opacity="0.65" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-weight="500" font-size="14px">.ai</text>
+  <text x="300" y="100" text-anchor="start" fill="url(#teal)" opacity="0.8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-weight="500" font-size="16px">.ai</text>
   <text x="210" y="124" text-anchor="start" fill="#4B5070" opacity="0.5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-weight="300" font-size="9px" letter-spacing="1">ED25519 DECENTRALIZED IDENTITY PROTOCOL</text>
 </svg>

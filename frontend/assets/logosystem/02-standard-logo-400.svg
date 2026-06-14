@@ -53,4 +53,4 @@
   <polygon points="205.0,182.0 211.7,186.0 211.7,194.0 205.0,198.0 198.3,194.0 198.3,186.0" fill="none" stroke="#F5D76E" stroke-width="0.4" opacity="0.2"/>
   <circle cx="205" cy="190" r="2.0" fill="#FFFEFA"/>
   <text x="200" y="355" text-anchor="middle" fill="#EFF1F5" opacity="0.92" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-weight="400" font-size="20px" letter-spacing="2">NEXUS</text>
-  <text x="214.4" y="354.6" text-anchor="middle" fill="url(#teal)" opacity="0.6" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-weight="500" font-size="9.0px">.ai</text></svg>
+  <text x="214.4" y="354.6" text-anchor="middle" fill="url(#teal)" opacity="0.78" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-weight="500" font-size="9.0px">.ai</text></svg>

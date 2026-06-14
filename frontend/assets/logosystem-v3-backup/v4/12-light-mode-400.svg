@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <defs>
+    <radialGradient id="lnode">
+      <stop offset="0%" stop-color="#D4A843" stop-opacity="1"/>
+      <stop offset="20%" stop-color="#B89230" stop-opacity="0.6"/>
+      <stop offset="60%" stop-color="#B89230" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#B89230" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="lcrystal">
+      <stop offset="0%" stop-color="#D4A843" stop-opacity="0.9"/>
+      <stop offset="30%" stop-color="#B89230" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#B89230" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="400" height="400" fill="#FAFAFA"/>
+  <circle cx="200" cy="175" r="117.44999999999999" fill="url(#outerGlow)"/>
+  <circle cx="200" cy="175" r="90.04499999999999" fill="none" stroke="#7B7590" stroke-width="0.46399999999999997" opacity="0.1"/>
+  <path d="M 267.80978911632155 135.85000000000002 Q 247.4668523814251 120.19000000000001, 200.0 96.7" fill="none" stroke="#D4A843" stroke-width="0.696" opacity="0.22"/>
+  <path d="M 200.0 96.7 Q 179.65706326510355 112.35999999999999, 132.19021088367847 135.84999999999997" fill="none" stroke="#D4A843" stroke-width="0.696" opacity="0.22"/>
+  <path d="M 132.19021088367847 135.84999999999997 Q 132.19021088367847 167.17, 132.19021088367845 214.14999999999998" fill="none" stroke="#D4A843" stroke-width="0.696" opacity="0.22"/>
+  <path d="M 132.19021088367845 214.14999999999998 Q 152.5331476185749 229.80999999999997, 199.99999999999997 253.3" fill="none" stroke="#D4A843" stroke-width="0.696" opacity="0.22"/>
+  <path d="M 199.99999999999997 253.3 Q 220.34293673489645 237.64000000000001, 267.80978911632155 214.14999999999998" fill="none" stroke="#D4A843" stroke-width="0.696" opacity="0.22"/>
+  <path d="M 267.80978911632155 214.14999999999998 Q 267.80978911632155 182.83, 267.80978911632155 135.85000000000002" fill="none" stroke="#D4A843" stroke-width="0.696" opacity="0.22"/>
+  <polygon points="267.80978911632155,135.85000000000002 200.0,96.7 132.19021088367847,135.84999999999997 132.19021088367845,214.14999999999998 199.99999999999997,253.3 267.80978911632155,214.14999999999998" fill="none" stroke="#D4A843" stroke-width="0.8699999999999999" opacity="0.45"/>
+  <line x1="200" y1="175" x2="267.80978911632155" y2="135.85000000000002" stroke="#D4A843" stroke-width="0.58" opacity="0.3"/>
+  <line x1="200" y1="175" x2="200.0" y2="96.7" stroke="#D4A843" stroke-width="0.58" opacity="0.3"/>
+  <line x1="200" y1="175" x2="132.19021088367847" y2="135.84999999999997" stroke="#D4A843" stroke-width="0.58" opacity="0.3"/>
+  <line x1="200" y1="175" x2="132.19021088367845" y2="214.14999999999998" stroke="#D4A843" stroke-width="0.58" opacity="0.3"/>
+  <line x1="200" y1="175" x2="199.99999999999997" y2="253.3" stroke="#D4A843" stroke-width="0.58" opacity="0.3"/>
+  <line x1="200" y1="175" x2="267.80978911632155" y2="214.14999999999998" stroke="#D4A843" stroke-width="0.58" opacity="0.3"/>
+  <circle cx="267.80978911632155" cy="135.85000000000002" r="13.34" fill="url(#lnode)"/>
+  <circle cx="267.80978911632155" cy="135.85000000000002" r="2.9" fill="none" stroke="#D4A843" stroke-width="0.754" opacity="0.55"/>
+  <circle cx="267.80978911632155" cy="135.85000000000002" r="1.16" fill="#F0CF5A" opacity="1.0"/>
+  <circle cx="200.0" cy="96.7" r="13.34" fill="url(#lnode)"/>
+  <circle cx="200.0" cy="96.7" r="2.9" fill="none" stroke="#D4A843" stroke-width="0.754" opacity="0.4"/>
+  <circle cx="200.0" cy="96.7" r="1.16" fill="#F0CF5A" opacity="0.75"/>
+  <circle cx="132.19021088367847" cy="135.84999999999997" r="13.34" fill="url(#lnode)"/>
+  <circle cx="132.19021088367847" cy="135.84999999999997" r="2.9" fill="none" stroke="#D4A843" stroke-width="0.754" opacity="0.5"/>
+  <circle cx="132.19021088367847" cy="135.84999999999997" r="1.16" fill="#F0CF5A" opacity="0.95"/>
+  <circle cx="132.19021088367845" cy="214.14999999999998" r="13.34" fill="url(#lnode)"/>
+  <circle cx="132.19021088367845" cy="214.14999999999998" r="2.9" fill="none" stroke="#D4A843" stroke-width="0.754" opacity="0.35"/>
+  <circle cx="132.19021088367845" cy="214.14999999999998" r="1.16" fill="#F0CF5A" opacity="0.65"/>
+  <circle cx="199.99999999999997" cy="253.3" r="13.34" fill="url(#lnode)"/>
+  <circle cx="199.99999999999997" cy="253.3" r="2.9" fill="none" stroke="#D4A843" stroke-width="0.754" opacity="0.48"/>
+  <circle cx="199.99999999999997" cy="253.3" r="1.16" fill="#F0CF5A" opacity="0.9"/>
+  <circle cx="267.80978911632155" cy="214.14999999999998" r="13.34" fill="url(#lnode)"/>
+  <circle cx="267.80978911632155" cy="214.14999999999998" r="2.9" fill="none" stroke="#D4A843" stroke-width="0.754" opacity="0.43"/>
+  <circle cx="267.80978911632155" cy="214.14999999999998" r="1.16" fill="#F0CF5A" opacity="0.8"/>
+  <circle cx="200" cy="175" r="26.389999999999997" fill="url(#lcrystal)"/>
+  <path d="M 200 154.7 L 211.571 168.301 L 211.571 181.699 L 200 195.3 L 188.429 181.699 L 188.429 168.301 Z" fill="#FAFAFA" stroke="#D4A843" stroke-width="1.45" opacity="0.9"/>
+  <path d="M 200 164.56 L 206.0552 171.5548 L 206.0552 178.4452 L 200 185.44 L 193.9448 178.4452 L 193.9448 171.5548 Z" fill="none" stroke="#D4A843" stroke-width="0.46399999999999997" opacity="0.45"/>
+  <circle cx="200" cy="175" r="9.135" fill="url(#lcrystal)" opacity="0.7"/>
+  <circle cx="200" cy="175" r="1.7399999999999998" fill="#F0CF5A"/>
+  <text x="200" y="350" text-anchor="middle" fill="#1A1A2E" opacity="0.92" font-family="-apple-system,system-ui,sans-serif" font-weight="400" font-size="17px" letter-spacing="1.24">NEXUS</text>
+  <text x="213.64" y="349.69" text-anchor="middle" fill="#B89230" opacity="0.88" font-family="-apple-system,system-ui,sans-serif" font-weight="400" font-size="6px">.ai</text>
+</svg>

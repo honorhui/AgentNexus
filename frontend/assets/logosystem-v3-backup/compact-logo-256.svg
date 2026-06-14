@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+<defs>
+    <linearGradient id="gcompact" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2ECC71"/>
+      <stop offset="100%" stop-color="#1ABC9C"/>
+    </linearGradient>
+  </defs>
+<polygon points="128.0,20.5 221.1,74.2 221.1,181.8 128.0,235.5 34.9,181.8 34.9,74.2" fill="none" stroke="url(#gcompact)" stroke-width="6.4" stroke-linejoin="round"/>
+<line x1="87.03999999999999" y1="176.64" x2="87.03999999999999" y2="79.36" stroke="url(#gcompact)" stroke-width="15.4" stroke-linecap="round"/>
+<line x1="87.03999999999999" y1="79.36" x2="168.95999999999998" y2="176.64" stroke="url(#gcompact)" stroke-width="15.4" stroke-linecap="round"/>
+<line x1="168.95999999999998" y1="79.36" x2="168.95999999999998" y2="176.64" stroke="url(#gcompact)" stroke-width="15.4" stroke-linecap="round"/>
+</svg>

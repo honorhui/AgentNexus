@@ -28,5 +28,5 @@
   <path d="M 151.4 104.9 Q 208.3 205.4 258.6 265.7" fill="none" stroke="url(#bridge)" stroke-width="3.4" stroke-linecap="round"/>
   <circle cx="205" cy="190" r="5.4" fill="#DAA520" opacity="0.2"/>
   <circle cx="205" cy="190" r="1.7" fill="#B8860B"/>  <text x="200" y="355" text-anchor="middle" fill="#1A1A2E" opacity="0.9" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-weight="400" font-size="20px" letter-spacing="2">NEXUS</text>
-  <text x="215" y="354" text-anchor="middle" fill="#2ECC71" opacity="0.7" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-weight="500" font-size="9px">.ai</text>
+  <text x="215" y="354" text-anchor="middle" fill="#2ECC71" opacity="0.85" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-weight="500" font-size="10px">.ai</text>
 </svg>
