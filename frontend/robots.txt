@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /.well-known/
+
+Sitemap: https://agentnexus.online/sitemap.xml

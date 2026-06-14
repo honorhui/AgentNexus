@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>关于 — Nexus Protocol</title>
+<meta name="description" content="Nexus Protocol 是基于 Ed25519 的去中心化身份协议。了解项目背景、技术架构和独立开发者的故事。">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/logosystem/09-favicon-32.png">
+<style>
+  :root { --bg:#0a0e14; --panel:#131820; --border:#1e2838; --text:#c8d6e5; --dim:#5c6e8a; --green:#2ecc71; --gold:#DAA520; --font-mono:'SF Mono',Consolas,monospace; --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
+  * { margin:0; padding:0; box-sizing:border-box }
+  body { background:var(--bg); color:var(--text); font-family:var(--font-sans); line-height:1.8; min-height:100vh }
+  .container { max-width:720px; margin:0 auto; padding:30px 24px }
+  header { display:flex; align-items:center; justify-content:space-between; padding:16px 0; border-bottom:1px solid var(--border); margin-bottom:36px }
+  header h1 { font-size:1.15em; font-family:var(--font-mono); color:#fff }
+  header h1 span { color:var(--green) }
+  header a { color:var(--green); text-decoration:none; font-size:.88em }
+  h2 { font-size:1.2em; font-family:var(--font-mono); color:#fff; margin:32px 0 12px; display:flex; align-items:center; gap:8px }
+  h2::before { content:''; width:4px; height:18px; background:var(--green); border-radius:2px }
+  p { color:var(--dim); margin-bottom:12px; font-size:.92em }
+  .highlight { color:var(--green); font-weight:600 }
+  .stat-row { display:flex; gap:32px; margin:20px 0; flex-wrap:wrap }
+  .stat { text-align:center }
+  .stat .num { font-size:1.6em; font-weight:700; color:var(--green); font-family:var(--font-mono) }
+  .stat .label { font-size:.78em; color:var(--dim) }
+  .cmd { display:inline-block; background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:8px 16px; font-family:var(--font-mono); font-size:.88em; color:#fff; margin:8px 0 }
+  .link-list { display:flex; flex-direction:column; gap:6px; margin:12px 0 }
+  .link-list a { color:var(--green); text-decoration:none; font-size:.9em; font-family:var(--font-mono) }
+  .link-list a:hover { text-decoration:underline }
+  footer { text-align:center; padding:40px 0; font-size:.78em; color:var(--dim); border-top:1px solid var(--border); margin-top:36px }
+  footer a { color:var(--green); text-decoration:none }
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+  <h1>Nexus<span>Protocol</span></h1>
+  <a href="/">← 返回首页</a>
+</header>
+
+<h2>这个项目是什么</h2>
+<p>Nexus Protocol 是一套基于 <span class="highlight">Ed25519 密码学</span> 的去中心化身份（DID）协议。它为 AI Agent 和人类用户提供无需中心化注册的身份体系——<span class="highlight">持有私钥即拥有身份</span>。</p>
+
+<p>不需要密码，不需要邮箱，不需要手机号。不需要任何公司批准。生成密钥对的那一刻，你就拥有了一个全网唯一的身份标识符：<code class="cmd">did:nexus:a1b2c3d4e5f67890</code></p>
+
+<h2>技术指标</h2>
+<div class="stat-row">
+  <div class="stat"><div class="num">839</div><div class="label">行核心代码</div></div>
+  <div class="stat"><div class="num">2</div><div class="label">依赖包</div></div>
+  <div class="stat"><div class="num">Ed25519</div><div class="label">密码学标准</div></div>
+  <div class="stat"><div class="num">MIT</div><div class="label">开源许可</div></div>
+</div>
+
+<h2>谁做的</h2>
+<p>这个项目从 0 到 1 由 <span class="highlight">一位独立开发者</span> 用 ❤️ 构建。没有融资，没有团队，只有一台上海腾讯云的 VPS 和对"身份不该被任何公司拥有"这一信念的执念。</p>
+
+<p>所有代码开源在 GitHub，PyPI 可安装，MIT 许可——任何人都可以自由使用、修改、分发。</p>
+
+<h2>链接</h2>
+<div class="link-list">
+  <a href="https://github.com/honorhui/AgentNexus" target="_blank">→ GitHub</a>
+  <a href="https://pypi.org/project/agentnexus-online/" target="_blank">→ PyPI</a>
+  <a href="https://juejin.cn/post/7650846556959965210" target="_blank">→ 掘金文章</a>
+  <a href="https://mp.weixin.qq.com/s/55Yjk8Qp5v-Z3kkVF2id7A" target="_blank">→ 公众号文章</a>
+</div>
+
+<footer>
+  <a href="/">Nexus Protocol</a> · agentnexus.online · MIT License
+</footer>
+</div>
+</body>
+</html>
