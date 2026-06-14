@@ -25,7 +25,7 @@ from nacl.encoding import HexEncoder
 
 
 DID_PREFIX = "did:nexus:"
-DEFAULT_API = "https://agentnexus.ai"  # 可覆盖
+DEFAULT_API = "https://agentnexus.online"  # 可覆盖
 
 
 class NexusAgent:
@@ -40,7 +40,7 @@ class NexusAgent:
         """
         参数:
             name: 特工昵称
-            api_base: Nexus API 地址, 默认 https://agentnexus.ai
+            api_base: Nexus API 地址, 默认 https://agentnexus.online
             key_file: 密钥文件路径, 默认 ~/.nexus/agent_key.json
         """
         self.name = name

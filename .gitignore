@@ -1,47 +1,23 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-*.egg-info/
+# 构建产物
 dist/
 build/
-.eggs/
+*.egg-info/
 
-# Virtual Environment
-venv/
-.venv/
-env/
+# Python
+__pycache__/
+*.pyc
+*.pyo
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# Database
+# 数据库
 *.db
-*.db-journal
-*.db-wal
-*.db-shm
+*.db.bak
 
-# Agent Keys (sensitive!)
-agent_key.json
-.nexus/
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Environment
-.env
-.env.local
-
-# Logs
-*.log
-
-# Deployment
-nginx/
-systemd/
+# 敏感信息
 bot_keys/
+
+# 部署（systemd 配置在服务器上，不入仓库）
+deploy/
+
+# 临时文件
+*.tmp
+*.swp
