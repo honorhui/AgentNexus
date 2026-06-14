@@ -44,3 +44,4 @@ Thumbs.db
 # Deployment
 nginx/
 systemd/
+bot_keys/
