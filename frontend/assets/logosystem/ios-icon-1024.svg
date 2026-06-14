@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+<rect width="1024" height="1024" fill="#0A0E14" rx="81.92"/>
+<defs>
+    <linearGradient id="gmain" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2ECC71"/>
+      <stop offset="100%" stop-color="#1ABC9C"/>
+    </linearGradient>
+  </defs>
+<circle cx="512.0" cy="512.0" r="507.4943999999999" fill="none" stroke="url(#gmain)" stroke-width="8.192" opacity="0.15"/>
+<polygon points="512.0,81.9 884.5,297.0 884.5,727.0 512.0,942.1 139.5,727.0 139.5,297.0" fill="none" stroke="url(#gmain)" stroke-width="25.6" stroke-linejoin="round"/>
+<line x1="348.15999999999997" y1="706.56" x2="348.15999999999997" y2="317.44" stroke="url(#gmain)" stroke-width="61.4" stroke-linecap="round"/>
+<line x1="348.15999999999997" y1="317.44" x2="675.8399999999999" y2="706.56" stroke="url(#gmain)" stroke-width="61.4" stroke-linecap="round"/>
+<line x1="675.8399999999999" y1="317.44" x2="675.8399999999999" y2="706.56" stroke="url(#gmain)" stroke-width="61.4" stroke-linecap="round"/>
+</svg>

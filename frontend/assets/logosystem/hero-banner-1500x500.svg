@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 500" width="1500" height="500">
+  <defs>
+    <linearGradient id="g_header" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2ECC71"/>
+      <stop offset="100%" stop-color="#1ABC9C"/>
+    </linearGradient>
+  </defs>
+  <circle cx="330.0" cy="250.0" r="218.49999999999997" fill="none" stroke="url(#g_header)" stroke-width="1.5" opacity="0.1"/>
+  <polygon points="330.0,60.0 494.5,155.0 494.5,345.0 330.0,440.0 165.5,345.0 165.5,155.0" fill="none" stroke="url(#g_header)" stroke-width="2.5" stroke-linejoin="round"/>
+
+  <!-- N letter -->
+  <g transform="translate(244.5, 164.5)">
+    <line x1="19.0" y1="171.0" x2="19.0" y2="9.5" stroke="url(#g_header)" stroke-width="26.6" stroke-linecap="round"/>
+    <line x1="19.0" y1="9.5" x2="161.5" y2="171.0" stroke="url(#g_header)" stroke-width="26.6" stroke-linecap="round"/>
+    <line x1="161.5" y1="9.5" x2="161.5" y2="171.0" stroke="url(#g_header)" stroke-width="26.6" stroke-linecap="round"/>
+  </g>
+
+  <text x="630.0" y="220.0" font-family="SF Mono, Consolas, monospace" font-size="140.0" font-weight="700" fill="#E8EDF2" letter-spacing="2">NEXUS</text>
+  <text x="630.0" y="360.0" font-family="SF Mono, Consolas, monospace" font-size="70.0" font-weight="600" fill="#2ECC71" letter-spacing="4">PROTOCOL</text>
+</svg>
