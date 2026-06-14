@@ -1,0 +1,40 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/did/v1",
+    "https://w3id.org/security/suites/ed25519-2020/v1"
+  ],
+  "id": "did:nexus:protocol",
+  "name": "Nexus Protocol",
+  "description": "Ed25519-based decentralized identity protocol for AI agents and humans.",
+  "verificationMethod": [
+    {
+      "id": "did:nexus:protocol#ed25519-key",
+      "type": "Ed25519VerificationKey2020",
+      "controller": "did:nexus:protocol"
+    }
+  ],
+  "authentication": ["did:nexus:protocol#ed25519-key"],
+  "assertionMethod": ["did:nexus:protocol#ed25519-key"],
+  "service": [
+    {
+      "id": "did:nexus:protocol#resolver",
+      "type": "DIDResolver",
+      "serviceEndpoint": "https://agentnexus.online/.well-known/did.json"
+    },
+    {
+      "id": "did:nexus:protocol#website",
+      "type": "Website",
+      "serviceEndpoint": "https://agentnexus.online"
+    },
+    {
+      "id": "did:nexus:protocol#github",
+      "type": "SourceCode",
+      "serviceEndpoint": "https://github.com/honorhui/AgentNexus"
+    },
+    {
+      "id": "did:nexus:protocol#pypi",
+      "type": "PackageRegistry",
+      "serviceEndpoint": "https://pypi.org/project/nexus-agent/"
+    }
+  ]
+}
