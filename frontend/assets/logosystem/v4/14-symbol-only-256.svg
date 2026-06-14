@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="node">
+      <stop offset="0%" stop-color="#F0CF5A" stop-opacity="1"/>
+      <stop offset="20%" stop-color="#D4A843" stop-opacity="0.6"/>
+      <stop offset="60%" stop-color="#D4A843" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#D4A843" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="crystal">
+      <stop offset="0%" stop-color="#F0CF5A" stop-opacity="0.9"/>
+      <stop offset="30%" stop-color="#D4A843" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#D4A843" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="outerGlow">
+      <stop offset="0%" stop-color="#D4A843" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#D4A843" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="monoNode">
+      <stop offset="0%" stop-color="#CCCCCC" stop-opacity="1"/>
+      <stop offset="20%" stop-color="#999999" stop-opacity="0.6"/>
+      <stop offset="60%" stop-color="#666666" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#444444" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="monoCrystal">
+      <stop offset="0%" stop-color="#CCCCCC" stop-opacity="0.9"/>
+      <stop offset="30%" stop-color="#999999" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#666666" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="256" height="256" fill="#080E1A"/>
+  <circle cx="128" cy="128" r="121.5" fill="url(#outerGlow)"/>
+  <circle cx="128" cy="128" r="93.14999999999999" fill="none" stroke="#7B7590" stroke-width="0.48" opacity="0.1"/>
+  <path d="M 198.14805770653953 87.5 Q 177.10364039457767 71.3, 128.0 47.0" fill="none" stroke="#D4A843" stroke-width="0.72" opacity="0.22"/>
+  <path d="M 128.0 47.0 Q 106.95558268803815 63.19999999999999, 57.85194229346048 87.49999999999997" fill="none" stroke="#D4A843" stroke-width="0.72" opacity="0.22"/>
+  <path d="M 57.85194229346048 87.49999999999997 Q 57.851942293460475 119.89999999999996, 57.85194229346045 168.49999999999997" fill="none" stroke="#D4A843" stroke-width="0.72" opacity="0.22"/>
+  <path d="M 57.85194229346045 168.49999999999997 Q 78.8963596054223 184.7, 127.99999999999999 209.0" fill="none" stroke="#D4A843" stroke-width="0.72" opacity="0.22"/>
+  <path d="M 127.99999999999999 209.0 Q 149.04441731196184 192.79999999999998, 198.14805770653953 168.49999999999997" fill="none" stroke="#D4A843" stroke-width="0.72" opacity="0.22"/>
+  <path d="M 198.14805770653953 168.49999999999997 Q 198.14805770653953 136.1, 198.14805770653953 87.5" fill="none" stroke="#D4A843" stroke-width="0.72" opacity="0.22"/>
+  <polygon points="198.14805770653953,87.5 128.0,47.0 57.85194229346048,87.49999999999997 57.85194229346045,168.49999999999997 127.99999999999999,209.0 198.14805770653953,168.49999999999997" fill="none" stroke="#D4A843" stroke-width="0.8999999999999999" opacity="0.45"/>
+  <line x1="128" y1="128" x2="198.14805770653953" y2="87.5" stroke="#D4A843" stroke-width="0.6" opacity="0.3"/>
+  <line x1="128" y1="128" x2="128.0" y2="47.0" stroke="#D4A843" stroke-width="0.6" opacity="0.3"/>
+  <line x1="128" y1="128" x2="57.85194229346048" y2="87.49999999999997" stroke="#D4A843" stroke-width="0.6" opacity="0.3"/>
+  <line x1="128" y1="128" x2="57.85194229346045" y2="168.49999999999997" stroke="#D4A843" stroke-width="0.6" opacity="0.3"/>
+  <line x1="128" y1="128" x2="127.99999999999999" y2="209.0" stroke="#D4A843" stroke-width="0.6" opacity="0.3"/>
+  <line x1="128" y1="128" x2="198.14805770653953" y2="168.49999999999997" stroke="#D4A843" stroke-width="0.6" opacity="0.3"/>
+  <circle cx="198.14805770653953" cy="87.5" r="13.799999999999999" fill="url(#node)"/>
+  <circle cx="198.14805770653953" cy="87.5" r="3.0" fill="none" stroke="#D4A843" stroke-width="0.78" opacity="0.55"/>
+  <circle cx="198.14805770653953" cy="87.5" r="1.2" fill="#F0CF5A" opacity="1.0"/>
+  <circle cx="128.0" cy="47.0" r="13.799999999999999" fill="url(#node)"/>
+  <circle cx="128.0" cy="47.0" r="3.0" fill="none" stroke="#D4A843" stroke-width="0.78" opacity="0.4"/>
+  <circle cx="128.0" cy="47.0" r="1.2" fill="#F0CF5A" opacity="0.75"/>
+  <circle cx="57.85194229346048" cy="87.49999999999997" r="13.799999999999999" fill="url(#node)"/>
+  <circle cx="57.85194229346048" cy="87.49999999999997" r="3.0" fill="none" stroke="#D4A843" stroke-width="0.78" opacity="0.5"/>
+  <circle cx="57.85194229346048" cy="87.49999999999997" r="1.2" fill="#F0CF5A" opacity="0.95"/>
+  <circle cx="57.85194229346045" cy="168.49999999999997" r="13.799999999999999" fill="url(#node)"/>
+  <circle cx="57.85194229346045" cy="168.49999999999997" r="3.0" fill="none" stroke="#D4A843" stroke-width="0.78" opacity="0.35"/>
+  <circle cx="57.85194229346045" cy="168.49999999999997" r="1.2" fill="#F0CF5A" opacity="0.65"/>
+  <circle cx="127.99999999999999" cy="209.0" r="13.799999999999999" fill="url(#node)"/>
+  <circle cx="127.99999999999999" cy="209.0" r="3.0" fill="none" stroke="#D4A843" stroke-width="0.78" opacity="0.48"/>
+  <circle cx="127.99999999999999" cy="209.0" r="1.2" fill="#F0CF5A" opacity="0.9"/>
+  <circle cx="198.14805770653953" cy="168.49999999999997" r="13.799999999999999" fill="url(#node)"/>
+  <circle cx="198.14805770653953" cy="168.49999999999997" r="3.0" fill="none" stroke="#D4A843" stroke-width="0.78" opacity="0.43"/>
+  <circle cx="198.14805770653953" cy="168.49999999999997" r="1.2" fill="#F0CF5A" opacity="0.8"/>
+  <circle cx="128" cy="128" r="27.3" fill="url(#crystal)"/>
+  <path d="M 128 107.0 L 139.97 121.07 L 139.97 134.93 L 128 149.0 L 116.03 134.93 L 116.03 121.07 Z" fill="#080E1A" stroke="#D4A843" stroke-width="1.5" opacity="0.9"/>
+  <path d="M 128 117.2 L 134.264 124.436 L 134.264 131.564 L 128 138.8 L 121.736 131.564 L 121.736 124.436 Z" fill="none" stroke="#D4A843" stroke-width="0.48" opacity="0.45"/>
+  <circle cx="128" cy="128" r="9.450000000000001" fill="url(#crystal)" opacity="0.7"/>
+  <circle cx="128" cy="128" r="1.7999999999999998" fill="#F0CF5A"/>
+</svg>
