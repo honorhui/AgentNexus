@@ -366,7 +366,7 @@ async def handle_agent_ws(websocket: WebSocket, token: str, db_path: str):
         return
 
     # 注册连接（使用递增计数器生成稳定 ID）
-    global _ws_counter
+    global _ws_counter, _ws_to_token
     _ws_counter += 1
     ws_id = str(_ws_counter)
     if token not in _active_connections:
@@ -508,7 +508,6 @@ async def handle_agent_ws(websocket: WebSocket, token: str, db_path: str):
         except Exception:
             pass
     finally:
-        global _ws_to_token
         # 清理连接
         if token in _active_connections and websocket in _active_connections[token]:
             _active_connections[token].remove(websocket)

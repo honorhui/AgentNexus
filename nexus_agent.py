@@ -25,7 +25,7 @@ from nacl.encoding import HexEncoder
 
 
 DID_PREFIX = "did:nexus:"
-DEFAULT_API = "https://agentnexus.ai"  # 可覆盖
+DEFAULT_API = "https://agentnexus.online"  # 可覆盖
 
 
 class NexusAgent:
